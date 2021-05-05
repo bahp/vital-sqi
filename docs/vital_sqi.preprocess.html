@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.preprocess package &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>vital_sqi.preprocess package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/vital_sqi.preprocess.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vital-sqi-preprocess-package">
+<h1>vital_sqi.preprocess package<a class="headerlink" href="#vital-sqi-preprocess-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vital_sqi.preprocess.band_filter">
+<span id="vital-sqi-preprocess-band-filter-module"></span><h2>vital_sqi.preprocess.band_filter module<a class="headerlink" href="#module-vital_sqi.preprocess.band_filter" title="Permalink to this headline">¶</a></h2>
+<p>Filtering of raw signals by bandpass</p>
+<dl class="py class">
+<dt id="vital_sqi.preprocess.band_filter.BandpassFilter">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vital_sqi.preprocess.band_filter.</span></code><code class="sig-name descname"><span class="pre">BandpassFilter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">band_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'butter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/band_filter.html#BandpassFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.band_filter.BandpassFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="vital_sqi.preprocess.band_filter.BandpassFilter.signal_bypass">
+<code class="sig-name descname"><span class="pre">signal_bypass</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_pass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">btype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'high'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/band_filter.html#BandpassFilter.signal_bypass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.band_filter.BandpassFilter.signal_bypass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.preprocess.band_filter.BandpassFilter.signal_highpass_filter">
+<code class="sig-name descname"><span class="pre">signal_highpass_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/band_filter.html#BandpassFilter.signal_highpass_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.band_filter.BandpassFilter.signal_highpass_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>High pass filter as described in scipy package
+:param data: list, array of input signal
+:param cutoff:
+:param fs:
+:param order:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.preprocess.band_filter.BandpassFilter.signal_lowpass_filter">
+<code class="sig-name descname"><span class="pre">signal_lowpass_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/band_filter.html#BandpassFilter.signal_lowpass_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.band_filter.BandpassFilter.signal_lowpass_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXPOSE
+Low pass filter as described in scipy package
+:param data: list, array of input signal
+:param cutoff:
+:param order:
+:param a_pass:
+:param rp: The maximum ripple allowed below unity gain in the passband.</p>
+<blockquote>
+<div><p>Specified in decibels, as a positive number.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rs</strong> – The minimum attenuation required in the stop band.
+Specified in decibels, as a positive number</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vital_sqi.preprocess.preprocess_signal">
+<span id="vital-sqi-preprocess-preprocess-signal-module"></span><h2>vital_sqi.preprocess.preprocess_signal module<a class="headerlink" href="#module-vital_sqi.preprocess.preprocess_signal" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="vital_sqi.preprocess.preprocess_signal.scale_pattern">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.preprocess.preprocess_signal.</span></code><code class="sig-name descname"><span class="pre">scale_pattern</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/preprocess_signal.html#scale_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.preprocess_signal.scale_pattern" title="Permalink to this definition">¶</a></dt>
+<dd><p>expose
+:param s:
+:param window_size:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.preprocess.preprocess_signal.smooth">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.preprocess.preprocess_signal.</span></code><code class="sig-name descname"><span class="pre">smooth</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flat'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/preprocess_signal.html#smooth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.preprocess_signal.smooth" title="Permalink to this definition">¶</a></dt>
+<dd><p>expose
+:param x:
+:param window_len:
+:param window:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.preprocess.preprocess_signal.squeeze_template">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.preprocess.preprocess_signal.</span></code><code class="sig-name descname"><span class="pre">squeeze_template</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/preprocess_signal.html#squeeze_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.preprocess_signal.squeeze_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param s:
+:param width:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.preprocess.preprocess_signal.tapering">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.preprocess.preprocess_signal.</span></code><code class="sig-name descname"><span class="pre">tapering</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/preprocess/preprocess_signal.html#tapering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.preprocess.preprocess_signal.tapering" title="Permalink to this definition">¶</a></dt>
+<dd><p>expose
+Pin the leftmost and rightmost signal to the zero baseline
+and amplify the remainder according to the window shape
+:param signal_data: list,
+:param window:sequence, array of floats indicates the windows types
+as described in scipy.windows
+:return: the tapered signal</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vital_sqi.preprocess">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vital_sqi.preprocess" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vital-sqi-preprocess">
+<h3>vital_sqi.preprocess<a class="headerlink" href="#vital-sqi-preprocess" title="Permalink to this headline">¶</a></h3>
+<p>A subpackage for all waveform preprocessing such as filtering, detrend etc.
+edit, resample.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

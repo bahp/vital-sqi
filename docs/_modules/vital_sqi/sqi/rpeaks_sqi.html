@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.sqi.rpeaks_sqi &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vital_sqi.sqi.rpeaks_sqi</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vital_sqi.sqi.rpeaks_sqi</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Signal quality indexes based on R peak detection&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+
+<span class="kn">import</span> <span class="nn">heartpy</span> <span class="k">as</span> <span class="nn">hp</span>
+<span class="kn">from</span> <span class="nn">heartpy.datautils</span> <span class="kn">import</span> <span class="n">rolling_mean</span>
+<span class="kn">from</span> <span class="nn">hrvanalysis</span> <span class="kn">import</span> <span class="n">get_time_domain_features</span><span class="p">,</span><span class="n">get_frequency_domain_features</span><span class="p">,</span>\
+    <span class="n">get_nn_intervals</span><span class="p">,</span><span class="n">get_csi_cvi_features</span><span class="p">,</span><span class="n">get_geometrical_features</span>
+<span class="kn">from</span> <span class="nn">hrvanalysis.preprocessing</span> <span class="kn">import</span> <span class="n">remove_outliers</span><span class="p">,</span><span class="n">remove_ectopic_beats</span><span class="p">,</span><span class="n">interpolate_nan_values</span>
+<span class="kn">from</span> <span class="nn">heartpy.analysis</span> <span class="kn">import</span> <span class="n">calc_ts_measures</span><span class="p">,</span> <span class="n">calc_rr</span><span class="p">,</span> <span class="n">calc_fd_measures</span><span class="p">,</span>\
+    <span class="n">clean_rr_intervals</span><span class="p">,</span><span class="n">calc_poincare</span><span class="p">,</span><span class="n">calc_breathing</span>
+<span class="kn">from</span> <span class="nn">heartpy.peakdetection</span> <span class="kn">import</span> <span class="n">check_peaks</span><span class="p">,</span> <span class="n">detect_peaks</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">acf</span>
+<span class="kn">from</span> <span class="nn">vital_sqi.common.rpeak_detection</span> <span class="kn">import</span> <span class="n">PeakDetector</span>
+
+<div class="viewcode-block" id="get_all_features_hrva"><a class="viewcode-back" href="../../../vital_sqi.sqi.html#vital_sqi.sqi.rpeaks_sqi.get_all_features_hrva">[docs]</a><span class="k">def</span> <span class="nf">get_all_features_hrva</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">sample_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">rpeak_method</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param data_sample:</span>
+<span class="sd">    :param sample_rate:</span>
+<span class="sd">    :param rpeak_method:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">rpeak_method</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]:</span>
+        <span class="n">detector</span> <span class="o">=</span> <span class="n">PeakDetector</span><span class="p">()</span>
+        <span class="n">peak_list</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">ppg_detector</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">rpeak_method</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rol_mean</span> <span class="o">=</span> <span class="n">rolling_mean</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span> <span class="n">windowsize</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mf">100.0</span><span class="p">)</span>
+        <span class="n">peaks_wd</span> <span class="o">=</span> <span class="n">detect_peaks</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">rol_mean</span><span class="p">,</span><span class="n">ma_perc</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">)</span>
+        <span class="n">peak_list</span> <span class="o">=</span> <span class="n">peaks_wd</span><span class="p">[</span><span class="s2">&quot;peaklist&quot;</span><span class="p">]</span>
+
+    <span class="n">rr_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">peak_list</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">sample_rate</span><span class="p">)</span> <span class="c1">#1000 milisecond</span>
+
+    <span class="n">nn_list</span> <span class="o">=</span> <span class="n">get_nn_intervals</span><span class="p">(</span><span class="n">rr_list</span><span class="p">)</span>
+    <span class="n">nn_list_non_na</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">nn_list</span><span class="p">)</span>
+    <span class="n">nn_list_non_na</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">nn_list_non_na</span><span class="p">))[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">time_domain_features</span> <span class="o">=</span> <span class="n">get_time_domain_features</span><span class="p">(</span><span class="n">rr_list</span><span class="p">)</span>
+    <span class="n">frequency_domain_features</span> <span class="o">=</span> <span class="n">get_frequency_domain_features</span><span class="p">(</span><span class="n">rr_list</span><span class="p">)</span>
+    <span class="n">geometrical_features</span> <span class="o">=</span> <span class="n">get_geometrical_features</span><span class="p">(</span><span class="n">rr_list</span><span class="p">)</span>
+    <span class="n">csi_cvi_features</span> <span class="o">=</span> <span class="n">get_csi_cvi_features</span><span class="p">(</span><span class="n">rr_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">time_domain_features</span><span class="p">,</span><span class="n">frequency_domain_features</span><span class="p">,</span>\
+           <span class="n">geometrical_features</span><span class="p">,</span><span class="n">csi_cvi_features</span></div>
+
+<div class="viewcode-block" id="get_all_features_heartpy"><a class="viewcode-back" href="../../../vital_sqi.sqi.html#vital_sqi.sqi.rpeaks_sqi.get_all_features_heartpy">[docs]</a><span class="k">def</span> <span class="nf">get_all_features_heartpy</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">sample_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">rpeak_detector</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="c1"># time domain features</span>
+    <span class="n">td_features</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bpm&quot;</span><span class="p">,</span> <span class="s2">&quot;ibi&quot;</span><span class="p">,</span> <span class="s2">&quot;sdnn&quot;</span><span class="p">,</span> <span class="s2">&quot;sdsd&quot;</span><span class="p">,</span> <span class="s2">&quot;rmssd&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;pnn20&quot;</span><span class="p">,</span> <span class="s2">&quot;pnn50&quot;</span><span class="p">,</span> <span class="s2">&quot;hr_mad&quot;</span><span class="p">,</span> <span class="s2">&quot;sd1&quot;</span><span class="p">,</span> <span class="s2">&quot;sd2&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;sd1/sd2&quot;</span><span class="p">,</span> <span class="s2">&quot;breathingrate&quot;</span><span class="p">]</span>
+    <span class="c1"># frequency domain features</span>
+    <span class="n">fd_features</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lf&quot;</span><span class="p">,</span> <span class="s2">&quot;hf&quot;</span><span class="p">,</span> <span class="s2">&quot;lf/hf&quot;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">wd</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span><span class="n">calc_freq</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wd</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">time_domain_features</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">td_features</span><span class="p">}</span>
+            <span class="n">frequency_domain_features</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fd_features</span><span class="p">}</span>
+            <span class="k">return</span> <span class="n">time_domain_features</span><span class="p">,</span><span class="n">frequency_domain_features</span>
+    <span class="k">if</span> <span class="n">rpeak_detector</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]:</span>
+        <span class="n">detector</span> <span class="o">=</span> <span class="n">PeakDetector</span><span class="p">(</span><span class="n">wave_type</span><span class="o">=</span><span class="s1">&#39;ecg&#39;</span><span class="p">)</span>
+        <span class="n">peak_list</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">ppg_detector</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">rpeak_detector</span><span class="p">,</span><span class="n">preprocess</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">wd</span><span class="p">[</span><span class="s2">&quot;peaklist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_list</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">calc_rr</span><span class="p">(</span><span class="n">peak_list</span><span class="p">,</span><span class="n">sample_rate</span><span class="p">,</span><span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">check_peaks</span><span class="p">(</span><span class="n">wd</span><span class="p">[</span><span class="s1">&#39;RR_list&#39;</span><span class="p">],</span> <span class="n">wd</span><span class="p">[</span><span class="s1">&#39;peaklist&#39;</span><span class="p">],</span> <span class="n">wd</span><span class="p">[</span><span class="s1">&#39;ybeat&#39;</span><span class="p">],</span>
+                                   <span class="n">reject_segmentwise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">clean_rr_intervals</span><span class="p">(</span><span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="n">rr_diff</span> <span class="o">=</span> <span class="n">wd</span><span class="p">[</span><span class="s1">&#39;RR_list&#39;</span><span class="p">]</span>
+        <span class="n">rr_sqdiff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">rr_diff</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">wd</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">calc_ts_measures</span><span class="p">(</span><span class="n">wd</span><span class="p">[</span><span class="s1">&#39;RR_list&#39;</span><span class="p">],</span> <span class="n">rr_diff</span><span class="p">,</span> <span class="n">rr_sqdiff</span><span class="p">,</span><span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">calc_poincare</span><span class="p">(</span><span class="n">wd</span><span class="p">[</span><span class="s1">&#39;RR_list&#39;</span><span class="p">],</span> <span class="n">wd</span><span class="p">[</span><span class="s1">&#39;RR_masklist&#39;</span><span class="p">],</span> <span class="n">measures</span><span class="o">=</span><span class="n">m</span><span class="p">,</span>
+                                 <span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">measures</span><span class="p">,</span> <span class="n">working_data</span> <span class="o">=</span> <span class="n">calc_breathing</span><span class="p">(</span><span class="n">wd</span><span class="p">[</span><span class="s1">&#39;RR_list_cor&#39;</span><span class="p">],</span> <span class="n">data_sample</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span>
+                                                    <span class="n">measures</span><span class="o">=</span><span class="n">m</span><span class="p">,</span>
+                                                    <span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;breathingrate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="n">wd</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">calc_fd_measures</span><span class="p">(</span><span class="n">measures</span><span class="o">=</span><span class="n">measures</span><span class="p">,</span><span class="n">working_data</span><span class="o">=</span><span class="n">working_data</span><span class="p">)</span>
+
+    <span class="n">time_domain_features</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">m</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">td_features</span><span class="p">}</span>
+
+    <span class="n">frequency_domain_features</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fd_features</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">frequency_domain_features</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frequency_domain_features</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="c1"># frequency_domain_features = {k:m[k] for k in fd_features if k in m.keys}</span>
+    <span class="c1"># frequency_domain_features = {k:np.na for k in fd_features if k not in m.keys}</span>
+
+    <span class="k">return</span> <span class="n">time_domain_features</span><span class="p">,</span><span class="n">frequency_domain_features</span></div>
+
+<div class="viewcode-block" id="get_peak_error_features"><a class="viewcode-back" href="../../../vital_sqi.sqi.html#vital_sqi.sqi.rpeaks_sqi.get_peak_error_features">[docs]</a><span class="k">def</span> <span class="nf">get_peak_error_features</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">sample_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">rpeak_detector</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">low_rri</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                            <span class="n">high_rri</span><span class="o">=</span><span class="mi">2000</span><span class="p">):</span>
+    <span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;malik&quot;</span><span class="p">,</span> <span class="s2">&quot;karlsson&quot;</span><span class="p">,</span> <span class="s2">&quot;kamath&quot;</span><span class="p">,</span> <span class="s2">&quot;acar&quot;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">wd</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">calc_freq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wd</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">error_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">rule</span><span class="o">+</span><span class="s2">&quot;_error&quot;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">}</span>
+            <span class="n">error_dict</span><span class="p">[</span><span class="s2">&quot;outlier_error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">return</span> <span class="n">error_dict</span>
+
+    <span class="k">if</span> <span class="n">rpeak_detector</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]:</span>
+        <span class="n">detector</span> <span class="o">=</span> <span class="n">PeakDetector</span><span class="p">(</span><span class="n">wave_type</span><span class="o">=</span><span class="s1">&#39;ecg&#39;</span><span class="p">)</span>
+        <span class="n">peak_list</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">ppg_detector</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span> <span class="n">rpeak_detector</span><span class="p">,</span> <span class="n">preprocess</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">wd</span><span class="p">[</span><span class="s2">&quot;peaklist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_list</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">calc_rr</span><span class="p">(</span><span class="n">peak_list</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">check_peaks</span><span class="p">(</span><span class="n">wd</span><span class="p">[</span><span class="s1">&#39;RR_list&#39;</span><span class="p">],</span> <span class="n">wd</span><span class="p">[</span><span class="s1">&#39;peaklist&#39;</span><span class="p">],</span> <span class="n">wd</span><span class="p">[</span><span class="s1">&#39;ybeat&#39;</span><span class="p">],</span>
+                         <span class="n">reject_segmentwise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">clean_rr_intervals</span><span class="p">(</span><span class="n">working_data</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+
+    <span class="n">rr_intervals</span> <span class="o">=</span> <span class="n">wd</span><span class="p">[</span><span class="s2">&quot;RR_list&quot;</span><span class="p">]</span>
+
+    <span class="n">rr_intervals_cleaned</span> <span class="o">=</span> <span class="n">remove_outliers</span><span class="p">(</span><span class="n">rr_intervals</span><span class="p">,</span> <span class="n">low_rri</span><span class="o">=</span><span class="n">low_rri</span><span class="p">,</span> <span class="n">high_rri</span><span class="o">=</span><span class="n">high_rri</span><span class="p">)</span>
+    <span class="n">number_outliers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rr_intervals_cleaned</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">outlier_ratio</span> <span class="o">=</span> <span class="n">number_outliers</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rr_intervals_cleaned</span><span class="p">)</span><span class="o">-</span><span class="n">number_outliers</span><span class="p">)</span>
+
+    <span class="n">error_sqi</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">error_sqi</span><span class="p">[</span><span class="s1">&#39;outlier_error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outlier_ratio</span>
+
+    <span class="n">interpolated_rr_intervals</span> <span class="o">=</span> <span class="n">interpolate_nan_values</span><span class="p">(</span><span class="n">rr_intervals_cleaned</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
+        <span class="n">nn_intervals</span> <span class="o">=</span> <span class="n">remove_ectopic_beats</span><span class="p">(</span><span class="n">interpolated_rr_intervals</span><span class="p">,</span>
+                                            <span class="n">method</span><span class="o">=</span><span class="n">rule</span><span class="p">)</span>
+        <span class="n">number_ectopics</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">nn_intervals</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ectopic_ratio</span> <span class="o">=</span> <span class="n">number_ectopics</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nn_intervals</span><span class="p">)</span><span class="o">-</span><span class="n">number_ectopics</span><span class="p">)</span>
+        <span class="n">error_sqi</span><span class="p">[</span><span class="n">rule</span><span class="o">+</span><span class="s2">&quot;_error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ectopic_ratio</span>
+
+    <span class="k">return</span> <span class="n">error_sqi</span></div>
+
+<div class="viewcode-block" id="correlogram_sqi"><a class="viewcode-back" href="../../../vital_sqi.sqi.html#vital_sqi.sqi.rpeaks_sqi.correlogram_sqi">[docs]</a><span class="k">def</span> <span class="nf">correlogram_sqi</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">sample_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">time_lag</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">n_selection</span> <span class="o">=</span> <span class="mi">3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The method is based on the paper &#39;Classification of the Quality of Wristband-based</span>
+<span class="sd">    Photoplethysmography Signals&#39;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_sample</span>
+<span class="sd">    sample_rate</span>
+<span class="sd">    time_lag</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nlags</span> <span class="o">=</span> <span class="n">time_lag</span><span class="o">*</span><span class="n">sample_rate</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">acf</span><span class="p">(</span><span class="n">data_sample</span><span class="p">,</span><span class="n">nlags</span><span class="o">=</span><span class="n">nlags</span><span class="p">)</span>
+    <span class="n">corr_peaks_idx</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">corr</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">corr_peaks_value</span> <span class="o">=</span> <span class="n">corr</span><span class="p">[</span><span class="n">corr_peaks_idx</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_selection</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">corr_peaks_value</span><span class="p">):</span>
+        <span class="n">n_selection</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">corr_peaks_value</span><span class="p">)</span>
+
+    <span class="n">corr_sqi</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">corr_peaks_idx</span><span class="p">[:</span><span class="n">n_selection</span><span class="p">]]</span><span class="o">+</span>\
+          <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">corr_peaks_value</span><span class="p">[:</span><span class="n">n_selection</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">corr_sqi</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

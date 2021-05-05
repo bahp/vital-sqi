@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.data package &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>vital_sqi.data package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/vital_sqi.data.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vital-sqi-data-package">
+<h1>vital_sqi.data package<a class="headerlink" href="#vital-sqi-data-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vital_sqi.data.removal_utilities">
+<span id="vital-sqi-data-removal-utilities-module"></span><h2>vital_sqi.data.removal_utilities module<a class="headerlink" href="#module-vital_sqi.data.removal_utilities" title="Permalink to this headline">¶</a></h2>
+<p>Trimming raw signals using: invalid values, noise at start/end of
+recordings etc.</p>
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.concate_removed_index">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">concate_removed_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_sliding_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#concate_removed_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.concate_removed_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param start_list:
+:param end_list:
+:param remove_sliding_window:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.cut_by_frequency_partition">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">cut_by_frequency_partition</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_examine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_threshold_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bound_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_sliding_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#cut_by_frequency_partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.cut_by_frequency_partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expose</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_examine</strong> – </p></li>
+<li><p><strong>window_size</strong> – </p></li>
+<li><p><strong>peak_threshold_ratio</strong> – </p></li>
+<li><p><strong>lower_bound_threshold</strong> – </p></li>
+<li><p><strong>remove_sliding_window</strong> – </p></li>
+<li><p><strong>overlap_rate</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.cut_invalid_rr_peak">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">cut_invalid_rr_peak</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#cut_invalid_rr_peak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.cut_invalid_rr_peak" title="Permalink to this definition">¶</a></dt>
+<dd><p>expose
+:param df:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.fill_missing_value">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">fill_missing_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arima'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#fill_missing_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.fill_missing_value" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – array of input time series</p></li>
+<li><p><strong>missing_index</strong> – array of list of starting indices missing data</p></li>
+<li><p><strong>missing_len</strong> – array of number of missing instances,</p></li>
+</ul>
+</dd>
+</dl>
+<p>matching with the index list
+:param method:
+:return:</p>
+<p>Example:
+&gt; missing_index = np.where(np.diff(df.TIMESTAMP_MS) &gt; 10)[0]
+&gt; missing_len = [int((df.TIMESTAMP_MS.iloc[i+1] - df.TIMESTAMP_MS.iloc[i])/10-1)</p>
+<blockquote>
+<div><p>for i in missing]</p>
+</div></blockquote>
+<p>&gt; filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.get_start_end_points">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">get_start_end_points</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_cut_pivot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_cut_pivot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#get_start_end_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.get_start_end_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param start_cut_pivot: array of starting points of the removal segment
+:param end_cut_pivot: array of relevant ending points of removal segment
+:param length_df: the length of the origin signal
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.remove_invalid">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">remove_invalid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#remove_invalid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.remove_invalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exposed
+Remove  the list of invalid data signal
+:param df:
+:param as_dataframe:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.remove_unchanged_squences">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">remove_unchanged_squences</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unchanged_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#remove_unchanged_squences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.remove_unchanged_squences" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.removal_utilities.trim_data">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.removal_utilities.</span></code><code class="sig-name descname"><span class="pre">trim_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minute_remove</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/removal_utilities.html#trim_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.removal_utilities.trim_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expose
+:param data:
+:param minute_remove:
+:param sampling_rate:
+:return:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vital_sqi.data.segment_split">
+<span id="vital-sqi-data-segment-split-module"></span><h2>vital_sqi.data.segment_split module<a class="headerlink" href="#module-vital_sqi.data.segment_split" title="Permalink to this headline">¶</a></h2>
+<p>Splitting long recordings into segments</p>
+<dl class="py function">
+<dt id="vital_sqi.data.segment_split.get_split_rr_index">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.segment_split.</span></code><code class="sig-name descname"><span class="pre">get_split_rr_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segment_seconds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/segment_split.html#get_split_rr_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.segment_split.get_split_rr_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+Return the index of the splitting points
+:param segment_seconds: the length of each cut split (in seconds)
+:param sequence:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.segment_split.get_split_time_index">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.segment_split.</span></code><code class="sig-name descname"><span class="pre">get_split_time_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segment_seconds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/segment_split.html#get_split_time_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.segment_split.get_split_time_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+Return the index of splitting points
+:param segment_seconds: the length of each cut split (in seconds)
+:param sequence:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.segment_split.save_each_segment">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.segment_split.</span></code><code class="sig-name descname"><span class="pre">save_each_segment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_file_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_img_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_trough_peak</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/segment_split.html#save_each_segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.segment_split.save_each_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save each n-second segment into csv and the relevant image
+:param filename: str, the origin file name
+:param segment_list: list, the list all split 30-second segments
+:param display_trough_peak: bool, default = False, display to trough and peak in the saved images
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.segment_split.save_segment_image">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.segment_split.</span></code><code class="sig-name descname"><span class="pre">save_segment_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saved_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_img_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_trough_peak</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/segment_split.html#save_segment_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.segment_split.save_segment_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param segment:
+:param saved_filename:
+:param save_img_folder:
+:param display_trough_peak:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.data.segment_split.split_to_subsegments">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.data.segment_split.</span></code><code class="sig-name descname"><span class="pre">split_to_subsegments</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length_second</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minute_remove</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ecg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_file_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_img_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_trough_peak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/data/segment_split.html#split_to_subsegments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.data.segment_split.split_to_subsegments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expose
+Split the data after applying bandpass filter and removing the first and last n-minutes
+(High pass filter with cutoff at 1Hz)
+The signal is split according to time domain - default is 30s
+:param filename: str, path to load file
+:param sampling_rate:float, default = 100.0. The sampling rate of the wearable device
+:param segment_length:float, default = 30.0. The length of the segment (in seconds)
+:param minute_remove: float, default = 5.0. The first and last of n-minutes to be removed
+:return:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vital_sqi.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vital_sqi.data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vital-sqi-data">
+<h3>vital_sqi.data<a class="headerlink" href="#vital-sqi-data" title="Permalink to this headline">¶</a></h3>
+<p>A subpackage for all raw waveform data manipulation such as read/write,
+edit, resample.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

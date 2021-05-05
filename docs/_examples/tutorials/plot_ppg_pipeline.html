@@ -1,0 +1,382 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>PPG pipeline &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="SQIs" href="../sqi/index.html" />
+    <link rel="prev" title="ECG Pipeline" href="plot_ecg_pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_data_manipulation.html">Data manipulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_ecg_pipeline.html">ECG Pipeline</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">PPG pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#load-the-data">Load the data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#preprocessing">Preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sqi-scores">SQI scores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visualization">Visualization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#final-notes">Final notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Tutorial</a> &raquo;</li>
+        
+      <li>PPG pipeline</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/_examples/tutorials/plot_ppg_pipeline.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-tutorials-plot-ppg-pipeline-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="ppg-pipeline">
+<span id="sphx-glr-examples-tutorials-plot-ppg-pipeline-py"></span><h1>PPG pipeline<a class="headerlink" href="#ppg-pipeline" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Include code to show how to create a pipeline to
+clean an ecg signal. It is probably in one of the
+jupyter notebooks (maybe ecg_qc.ipynb).</p>
+</div>
+<div class="section" id="load-the-data">
+<h2>Load the data<a class="headerlink" href="#load-the-data" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="c1"># First, lets load the data (ppg sample data)</span>
+
+ <span class="c1"># Libraries</span>
+ <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+ <span class="c1"># Load data</span>
+ <span class="c1">#data = pd.read_csv(path)</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<p>Wearable devices need some time to pick up stable signals. For this reason,
+it is a common practice to trim the data. In the following example, the f
+first and last 5 minutes of each recording are trimmed to exclude unstable
+signals.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">35</span>
+<span class="normal">36</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="c1"># Trim data</span>
+ <span class="c1">#data = trim(data, start=5, end=5)</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, lets remove the following noise:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PLETH</span></code> is 0 or unchanged values for xxx time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SpO2</span></code> &lt; 80</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Pulse</span></code> &gt; 200 bpm or <code class="docutils literal notranslate"><span class="pre">Pulse</span></code> &lt; 40 bpm</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Perfusion</span></code> &lt; 0.2</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Lost</span> <span class="pre">connection</span></code>: sampling rate reduced due to (possible) Bluetooth connection
+lost. Timestamp column shows missing timepoints. If the missing duration is
+larger than 1 cycle (xxx ms), recording is split. If not, missing timepoints
+are interpolated.</p></li>
+</ul>
+</div></blockquote>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="c1"># Remove invalid PLETH</span>
+ <span class="c1">#idxs_1 = data.PLETH == 0</span>
+ <span class="c1">#idxs_2 = unchanged(period=xxxx)</span>
+ <span class="c1">#data = data[~(idxs_1 | idxs_2)]</span>
+
+ <span class="c1"># Remove invalid ranges</span>
+ <span class="c1">#data = data[data.SpO2&gt;=80]</span>
+ <span class="c1">#data = data[data.Pulse.between(40, 200)]</span>
+ <span class="c1">#data = data[data.Perfusion&gt;=0.2]</span>
+
+ <span class="c1"># Remove lost connection</span>
+ <span class="c1">#data = data[lost_connection(min_fs, max_fs) ??</span>
+
+ <span class="c1"># The recording is then split into files.</span>
+</pre></div>
+</td></tr></table></div>
+<p>Lets filter the data with a band pass filter; high pass filter (cut off at 1Hz)</p>
+<p>Lets detrend the signal</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="c1"># Lets split the data</span>
+ <span class="c1">#4.1. Cut data by time domain. Split data into sub segments of 30 seconds</span>
+ <span class="c1">#4.2. Apply the peak and trough detection methods in peak_approaches.py to get single PPG cycles in each segment</span>
+ <span class="c1">#4.3. Shift baseline above 0 and tapering each single PPG cycle to compute the mean template</span>
+ <span class="c1">#Notes: the described process is implemented in split_to_segments.py</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="sqi-scores">
+<h2>SQI scores<a class="headerlink" href="#sqi-scores" title="Permalink to this headline">¶</a></h2>
+<p>Lets compute the SQI scores</p>
+</div>
+<div class="section" id="visualization">
+<h2>Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="final-notes">
+<h2>Final notes<a class="headerlink" href="#final-notes" title="Permalink to this headline">¶</a></h2>
+<p>Initially, it might have a lot of code. If the library
+grows, as Stefan mentioned it might be possible to
+create a generalised pipeline from sub-methods or
+classes. Or allow the user to configure the process
+and then automate all the run.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="c1"># Create steps</span>
+ <span class="c1">#step1 = Trim(start=5, end=5)</span>
+ <span class="c1">#step2 = Unchanged(param1=x, param2=y)</span>
+ <span class="c1">#step3 = LostConnection(param1=20, param2=30)</span>
+
+ <span class="c1"># Create pipeline</span>
+ <span class="c1">#pipe = Pipeline(steps=[(&#39;step1&#39;, step1),</span>
+ <span class="c1">#                       (&#39;step2&#39;, step2),</span>
+ <span class="c1">#                       (&#39;step3&#39;, step3))</span>
+
+ <span class="c1"># Data</span>
+ <span class="c1">#data = pipe.fit_transform(data)</span>
+</pre></div>
+</td></tr></table></div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.001 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-tutorials-plot-ppg-pipeline-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/ea1b87c988c8fac7bf3edd8ab57d8a7c/plot_ppg_pipeline.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_ppg_pipeline.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/89fcd2f34a3612038a9088a5b68488d0/plot_ppg_pipeline.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_ppg_pipeline.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../sqi/index.html" class="btn btn-neutral float-right" title="SQIs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="plot_ecg_pipeline.html" class="btn btn-neutral float-left" title="ECG Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

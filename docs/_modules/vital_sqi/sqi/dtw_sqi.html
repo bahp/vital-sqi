@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.sqi.dtw_sqi &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vital_sqi.sqi.dtw_sqi</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vital_sqi.sqi.dtw_sqi</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dtw</span> <span class="kn">import</span> <span class="n">dtw</span>
+<span class="kn">from</span> <span class="nn">vital_sqi.common.generate_template</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">ppg_absolute_dual_skewness_template</span><span class="p">,</span>
+        <span class="n">ppg_dual_double_frequency_template</span><span class="p">,</span>
+        <span class="n">ppg_nonlinear_dynamic_system_template</span><span class="p">,</span>
+        <span class="n">ecg_dynamic_template</span>
+    <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">vital_sqi.common.utils</span> <span class="kn">import</span> <span class="n">check_valid_signal</span>
+
+
+<div class="viewcode-block" id="dtw_sqi"><a class="viewcode-back" href="../../../vital_sqi.sqi.html#vital_sqi.sqi.dtw_sqi.dtw_sqi">[docs]</a><span class="k">def</span> <span class="nf">dtw_sqi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">template_type</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Using DTW to get the mapping point distance between a signal and its</span>
+<span class="sd">    template. The DTW SQI is the ratio of the distance sum to</span>
+<span class="sd">    the trace of cost matrix. The closer to 1 the better SQI.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x :</span>
+<span class="sd">        array_like, signal containing int or float values.</span>
+<span class="sd">    template_type :</span>
+<span class="sd">        int,</span>
+<span class="sd">        0: ppg_absolute_dual_skewness_template,</span>
+<span class="sd">        1: ppg_dual_double_frequency_template,</span>
+<span class="sd">        2: ppg_nonlinear_dynamic_system_template,</span>
+<span class="sd">        3: ecg_dynamic_template</span>
+<span class="sd">        default = 0</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    type</span>
+<span class="sd">        float, the matching score with the chosen template</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_valid_signal</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">template_type</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">template_type</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid template type&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">template_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="n">ppg_nonlinear_dynamic_system_template</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">template_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="n">ppg_dual_double_frequency_template</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">template_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="n">ppg_absolute_dual_skewness_template</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">template_type</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="n">ecg_dynamic_template</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">alignmentOBE</span> <span class="o">=</span> <span class="n">dtw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">keep_internals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">step_pattern</span><span class="o">=</span><span class="s1">&#39;asymmetric&#39;</span><span class="p">,</span> <span class="n">open_end</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">open_begin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">match_distance</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alignmentOBE</span><span class="o">.</span><span class="n">index2</span><span class="p">)):</span>
+        <span class="n">match_distance</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">alignmentOBE</span><span class="o">.</span><span class="n">costMatrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">alignmentOBE</span><span class="o">.</span><span class="n">index2</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                <span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">alignmentOBE</span><span class="o">.</span><span class="n">costMatrix</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">trace</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">match_distance</span><span class="p">)</span><span class="o">/</span><span class="n">trace</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ratio</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

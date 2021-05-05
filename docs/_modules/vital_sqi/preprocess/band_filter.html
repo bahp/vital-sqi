@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.preprocess.band_filter &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vital_sqi.preprocess.band_filter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vital_sqi.preprocess.band_filter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; Filtering of raw signals by bandpass&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">butter</span><span class="p">,</span> <span class="n">lfilter</span><span class="p">,</span> <span class="n">freqz</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+
+<div class="viewcode-block" id="BandpassFilter"><a class="viewcode-back" href="../../../vital_sqi.preprocess.html#vital_sqi.preprocess.band_filter.BandpassFilter">[docs]</a><span class="k">class</span> <span class="nc">BandpassFilter</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">band_type</span><span class="o">=</span><span class="s2">&quot;butter&quot;</span><span class="p">,</span><span class="n">fs</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param band_type: type of bandpass.</span>
+<span class="sd">            &quot;butter&quot;: butterworth</span>
+<span class="sd">            &quot;cheby1&quot;: chebyshev-1</span>
+<span class="sd">            &quot;cheby2&quot;: chebyshev-2</span>
+<span class="sd">            &quot;ellip&quot; : Elliptic (Cauer) digital and analog filter design</span>
+<span class="sd">            &quot;bessel&quot;: Bessel/Thomson digital and analog filter design.</span>
+<span class="sd">        :param fs: sampling frequency</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">=</span> <span class="n">band_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span>
+
+<div class="viewcode-block" id="BandpassFilter.signal_bypass"><a class="viewcode-back" href="../../../vital_sqi.preprocess.html#vital_sqi.preprocess.band_filter.BandpassFilter.signal_bypass">[docs]</a>    <span class="k">def</span> <span class="nf">signal_bypass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">cutoff</span><span class="p">,</span><span class="n">order</span><span class="p">,</span><span class="n">a_pass</span><span class="p">,</span><span class="n">rp</span><span class="p">,</span><span class="n">rs</span><span class="p">,</span><span class="n">btype</span><span class="o">=</span><span class="s1">&#39;high&#39;</span><span class="p">):</span>
+        <span class="n">nyq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span>
+        <span class="n">normal_cutoff</span> <span class="o">=</span> <span class="n">cutoff</span> <span class="o">/</span> <span class="n">nyq</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s1">&#39;cheby1&#39;</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">cheby1</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">a_pass</span><span class="p">,</span> <span class="n">normal_cutoff</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="n">btype</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s1">&#39;cheby2&#39;</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">cheby2</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">a_pass</span><span class="p">,</span> <span class="n">normal_cutoff</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="n">btype</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s1">&#39;ellip&#39;</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">ellip</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span> <span class="n">normal_cutoff</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="n">btype</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s1">&#39;bessel&#39;</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">bessel</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">normal_cutoff</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="n">btype</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">normal_cutoff</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="n">btype</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span></div>
+
+<div class="viewcode-block" id="BandpassFilter.signal_lowpass_filter"><a class="viewcode-back" href="../../../vital_sqi.preprocess.html#vital_sqi.preprocess.band_filter.BandpassFilter.signal_lowpass_filter">[docs]</a>    <span class="k">def</span> <span class="nf">signal_lowpass_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">cutoff</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">a_pass</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">rp</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">rs</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            EXPOSE</span>
+<span class="sd">            Low pass filter as described in scipy package</span>
+<span class="sd">            :param data: list, array of input signal</span>
+<span class="sd">            :param cutoff:</span>
+<span class="sd">            :param order:</span>
+<span class="sd">            :param a_pass:</span>
+<span class="sd">            :param rp: The maximum ripple allowed below unity gain in the passband.</span>
+<span class="sd">                    Specified in decibels, as a positive number.</span>
+<span class="sd">            :param rs: The minimum attenuation required in the stop band.</span>
+<span class="sd">                    Specified in decibels, as a positive number</span>
+<span class="sd">            :return:</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_bypass</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">a_pass</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span><span class="n">btype</span><span class="o">=</span><span class="s1">&#39;low&#39;</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span></div>
+
+<div class="viewcode-block" id="BandpassFilter.signal_highpass_filter"><a class="viewcode-back" href="../../../vital_sqi.preprocess.html#vital_sqi.preprocess.band_filter.BandpassFilter.signal_highpass_filter">[docs]</a>    <span class="k">def</span> <span class="nf">signal_highpass_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">a_pass</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">rp</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">rs</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            High pass filter as described in scipy package</span>
+<span class="sd">            :param data: list, array of input signal</span>
+<span class="sd">            :param cutoff:</span>
+<span class="sd">            :param fs:</span>
+<span class="sd">            :param order:</span>
+<span class="sd">            :return:</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_bypass</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span><span class="n">a_pass</span><span class="p">,</span><span class="n">rp</span><span class="p">,</span><span class="n">rs</span><span class="p">,</span><span class="n">btype</span><span class="o">=</span><span class="s1">&#39;high&#39;</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span></div></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

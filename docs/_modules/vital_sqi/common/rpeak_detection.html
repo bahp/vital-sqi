@@ -1,0 +1,762 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.common.rpeak_detection &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vital_sqi.common.rpeak_detection</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vital_sqi.common.rpeak_detection</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;R peak detection approaches for PPG and ECG&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+
+<span class="kn">from</span> <span class="nn">vital_sqi.preprocess.band_filter</span> <span class="kn">import</span> <span class="n">BandpassFilter</span>
+<span class="kn">from</span> <span class="nn">vital_sqi.common.generate_template</span> <span class="kn">import</span> <span class="n">ecg_dynamic_template</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">ecgdetectors</span> <span class="kn">import</span> <span class="n">Detectors</span><span class="p">,</span> <span class="n">panPeakDetect</span>
+
+<span class="n">ADAPTIVE_THRESHOLD</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">COUNT_ORIG_METHOD</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">CLUSTERER_METHOD</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">SLOPE_SUM_METHOD</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">MOVING_AVERAGE_METHOD</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">DEFAULT_SCIPY</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="n">ADAPTIVE_THRESHOLD</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">COUNT_ORIG_METHOD</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">CLUSTERER_METHOD</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">SLOPE_SUM_METHOD</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">MOVING_AVERAGE_METHOD</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">DEFAULT_SCIPY</span> <span class="o">=</span> <span class="mi">6</span>
+
+<div class="viewcode-block" id="PeakDetector"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector">[docs]</a><span class="k">class</span> <span class="nc">PeakDetector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Various peak detection approaches getting from the paper</span>
+<span class="sd">    Systolic Peak Detection in Acceleration Photoplethysmograms Measured</span>
+<span class="sd">    from Emergency Responders in Tropical Conditions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wave_type</span><span class="o">=</span><span class="s1">&#39;ppg&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wave_type</span> <span class="o">=</span> <span class="n">wave_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span>
+
+<div class="viewcode-block" id="PeakDetector.ecg_detector"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.ecg_detector">[docs]</a>    <span class="k">def</span> <span class="nf">ecg_detector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">detector_type</span><span class="o">=</span><span class="s2">&quot;pan_tompkins&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expose</span>
+
+<span class="sd">        ECG peak detector from the github</span>
+<span class="sd">        https://github.com/berndporr/py-ecg-detectors</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s :</span>
+<span class="sd">            Input signal</span>
+
+<span class="sd">        fs:</span>
+<span class="sd">            The signal frequency. Default is &#39;256 Hz&#39;</span>
+
+<span class="sd">        detector_type:</span>
+<span class="sd">            &#39;hamilton&#39;: Open Source ECG Analysis Software Documentation,</span>
+<span class="sd">            E.P.Limited, 2002.</span>
+
+<span class="sd">            &#39;christov&#39;:Real time electrocardiogram QRS detection using combined</span>
+<span class="sd">            adaptive threshold</span>
+
+<span class="sd">            &#39;engzee&#39;: A single scan algorithm for QRS detection and</span>
+<span class="sd">            feature extraction</span>
+
+<span class="sd">            &#39;swt&#39;: Real-time QRS detector using Stationary Wavelet Transform</span>
+<span class="sd">            for Automated ECG Analysis.</span>
+<span class="sd">            Uses the Pan and Tompkins thresolding.</span>
+
+<span class="sd">            &#39;mva&#39;: Frequency Bands Effects on QRS Detection.</span>
+
+<span class="sd">            &#39;mtemp&#39;:</span>
+
+<span class="sd">            &#39;pan_tompkins&#39;: A Real-Time QRS Detection Algorithm</span>
+
+<span class="sd">            Default = &#39;pan_tompkins&#39;</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        type</span>
+<span class="sd">            an array of 1-D numpy array represent the peak list</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wave_type</span> <span class="o">==</span> <span class="s1">&#39;ppg&#39;</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;A ECG detectors is using on PPG waveform. &quot;</span>
+                          <span class="s2">&quot;Output may produce incorrect result&quot;</span><span class="p">)</span>
+        <span class="n">detector</span> <span class="o">=</span> <span class="n">Detectors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="s1">&#39;hamilton&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">hamilton_detector</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="s1">&#39;christov&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">christov_detector</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="s1">&#39;engzee&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">engzee_detector</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="s1">&#39;swt&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">swt_detector</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="s1">&#39;mva&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">two_average_detector</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="s1">&#39;mtemp&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_filter_detector</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">pan_tompkins_detector</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PeakDetector.ppg_detector"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.ppg_detector">[docs]</a>    <span class="k">def</span> <span class="nf">ppg_detector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">detector_type</span><span class="o">=</span><span class="n">ADAPTIVE_THRESHOLD</span><span class="p">,</span>
+                     <span class="n">clusterer</span><span class="o">=</span><span class="s2">&quot;kmean&quot;</span><span class="p">,</span> <span class="n">preprocess</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cubing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expose</span>
+
+<span class="sd">        PPG peak detector from the paper</span>
+<span class="sd">        Systolic Peak Detection in Acceleration Photoplethysmograms Measured</span>
+<span class="sd">        from Emergency Responders in Tropical Conditions</span>
+
+<span class="sd">        :param s: the input signal</span>
+<span class="sd">        :param detector_type:</span>
+<span class="sd">        :param clusterer:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">preprocess</span><span class="p">:</span>
+            <span class="nb">filter</span> <span class="o">=</span> <span class="n">BandpassFilter</span><span class="p">()</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">signal_highpass_filter</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">signal_lowpass_filter</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cubing</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">**</span> <span class="mi">3</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wave_type</span> <span class="o">!=</span> <span class="s2">&quot;ppg&quot;</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;A PPG detectors is using on  unrecognized &quot;</span>
+                          <span class="s2">&quot;PPG waveform. Output may produce incorrect result&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="n">CLUSTERER_METHOD</span><span class="p">:</span>
+                <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">detect_peak_trough_clusterer</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="n">SLOPE_SUM_METHOD</span><span class="p">:</span>
+                <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">detect_peak_trough_slope_sum</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="n">MOVING_AVERAGE_METHOD</span><span class="p">:</span>
+                <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">detect_peak_trough_moving_average_threshold</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="n">COUNT_ORIG_METHOD</span><span class="p">:</span>
+                <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">detect_peak_trough_count_orig</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">detector_type</span> <span class="o">==</span> <span class="n">DEFAULT_SCIPY</span><span class="p">:</span>
+                <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">detect_peak_trough_default_scipy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">detect_peak_trough_adaptive_threshold</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span></div>
+
+<div class="viewcode-block" id="PeakDetector.matched_filter_detector"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.matched_filter_detector">[docs]</a>    <span class="k">def</span> <span class="nf">matched_filter_detector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unfiltered_ecg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        FIR matched filter using template of QRS complex.</span>
+<span class="sd">        Template provided in generate_template file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">ecg_dynamic_template</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
+
+        <span class="n">f0</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="mi">48</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span>
+
+        <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">[</span><span class="n">f0</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">f1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">],</span> <span class="n">btype</span><span class="o">=</span><span class="s1">&#39;bandpass&#39;</span><span class="p">)</span>
+
+        <span class="n">prefiltered_ecg</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">unfiltered_ecg</span><span class="p">)</span>
+
+        <span class="n">matched_coeffs</span> <span class="o">=</span> <span class="n">template</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># time reversing template</span>
+
+        <span class="c1"># matched filter FIR filtering</span>
+        <span class="n">detection</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">matched_coeffs</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">prefiltered_ecg</span><span class="p">)</span>
+        <span class="c1"># squaring matched filter output</span>
+        <span class="n">squared</span> <span class="o">=</span> <span class="n">detection</span> <span class="o">*</span> <span class="n">detection</span>
+        <span class="n">squared</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">template</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">squared_peaks</span> <span class="o">=</span> <span class="n">panPeakDetect</span><span class="p">(</span><span class="n">squared</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">squared_peaks</span></div>
+
+<div class="viewcode-block" id="PeakDetector.compute_feature"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.compute_feature">[docs]</a>    <span class="k">def</span> <span class="nf">compute_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">local_extrema</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s :</span>
+
+<span class="sd">        local_extrema :</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">local_extrema</span><span class="p">]</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">amplitude</span><span class="p">)</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">mean_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">diff</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">amplitude</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">mean_diff</span> <span class="o">=</span> <span class="n">mean_diff</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">mean_diff</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PeakDetector.detect_peak_trough_clusterer"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_clusterer">[docs]</a>    <span class="k">def</span> <span class="nf">detect_peak_trough_clusterer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">clusterer</span><span class="o">=</span><span class="s1">&#39;kmean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        Method 1: using clustering technique</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s :</span>
+<span class="sd">            The input signals</span>
+<span class="sd">        method :</span>
+<span class="sd">            param kwargs:</span>
+<span class="sd">        **kwargs :</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        type</span>
+<span class="sd">            tuple of 1-D numpy array</span>
+<span class="sd">            the first array is the peak list</span>
+<span class="sd">            and the second array is the troughs list</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># squarring doesnot work</span>
+        <span class="c1"># s = np.array(s) ** 2</span>
+        <span class="n">local_maxima</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">argrelmax</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">local_minima</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">argrelmin</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># local_minima_amplitude = s[local_minima]</span>
+        <span class="c1"># local_maxima_amplitude = s[local_maxima]</span>
+        <span class="c1"># lower, middle, upper = np.quantile(s, [0.25, 0.5, 0.75])</span>
+
+        <span class="c1"># clusterer = KMeans(kwargs)</span>
+        <span class="n">clusterer</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s1">&#39;k-means++&#39;</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                           <span class="n">max_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+                           <span class="n">precompute_distances</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span>
+                           <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">n_jobs</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+
+        <span class="n">convert_maxima</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_feature</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">local_maxima</span><span class="p">)</span>
+        <span class="n">clusterer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">convert_maxima</span><span class="p">)</span>
+        <span class="n">systolic_group</span> <span class="o">=</span> <span class="n">clusterer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+            <span class="n">convert_maxima</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">local_maxima</span><span class="p">])]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">clusterer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">convert_maxima</span><span class="p">)</span>
+
+        <span class="n">systolic_peaks_idx</span> <span class="o">=</span> <span class="n">local_maxima</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">systolic_group</span><span class="p">)]</span>
+
+        <span class="c1"># ========================================================</span>
+        <span class="c1"># The same with troughs</span>
+
+        <span class="n">convert_minima</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_feature</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">local_minima</span><span class="p">)</span>
+        <span class="n">clusterer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">convert_minima</span><span class="p">)</span>
+        <span class="n">trough_group</span> <span class="o">=</span> <span class="n">clusterer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+            <span class="n">convert_minima</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">local_minima</span><span class="p">])]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">clusterer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">convert_minima</span><span class="p">)</span>
+
+        <span class="n">trough_idx</span> <span class="o">=</span> <span class="n">local_minima</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">trough_group</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="n">systolic_peaks_idx</span><span class="p">,</span> <span class="n">trough_idx</span></div>
+
+<div class="viewcode-block" id="PeakDetector.get_ROI"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.get_ROI">[docs]</a>    <span class="k">def</span> <span class="nf">get_ROI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">mva</span><span class="p">):</span>
+        <span class="n">start_pos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">end_pos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mva</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mva</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">start_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">mva</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mva</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> \
+                    <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_pos</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">end_pos</span><span class="p">):</span>
+                <span class="n">end_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_pos</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">end_pos</span><span class="p">):</span>
+            <span class="n">end_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">start_pos</span><span class="p">,</span> <span class="n">end_pos</span></div>
+
+<div class="viewcode-block" id="PeakDetector.detect_peak_trough_adaptive_threshold"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_adaptive_threshold">[docs]</a>    <span class="k">def</span> <span class="nf">detect_peak_trough_adaptive_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span>
+                                              <span class="n">adaptive_size</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
+                                              <span class="n">overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sliding</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param s:</span>
+<span class="sd">        :param adaptive_size:</span>
+<span class="sd">        :param overlap: overlapping ratio</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># number of instances in the adaptive window</span>
+        <span class="n">adaptive_window</span> <span class="o">=</span> <span class="n">adaptive_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span>
+        <span class="n">adaptive_threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_moving_average</span><span class="p">(</span>
+            <span class="n">s</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">adaptive_window</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">start_ROIs</span><span class="p">,</span> <span class="n">end_ROIs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ROI</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">adaptive_threshold</span><span class="p">)</span>
+        <span class="n">peak_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">start_ROI</span><span class="p">,</span> <span class="n">end_ROI</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">start_ROIs</span><span class="p">,</span> <span class="n">end_ROIs</span><span class="p">):</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">start_ROI</span><span class="p">:</span><span class="n">end_ROI</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">peak_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">region</span><span class="p">)</span> <span class="o">+</span> <span class="n">start_ROI</span><span class="p">)</span>
+
+        <span class="n">trough_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">peak_finalist</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">peak_finalist</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">peak_finalist</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">trough_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">region</span><span class="p">)</span> <span class="o">+</span> <span class="n">peak_finalist</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span></div>
+
+<div class="viewcode-block" id="PeakDetector.detect_peak_trough_default_scipy"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_default_scipy">[docs]</a>    <span class="k">def</span> <span class="nf">detect_peak_trough_default_scipy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="n">peak_finalist</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">trough_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">peak_finalist</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">peak_finalist</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">peak_finalist</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">trough_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">region</span><span class="p">)</span> <span class="o">+</span> <span class="n">peak_finalist</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">trough_finalist</span></div>
+
+<div class="viewcode-block" id="PeakDetector.detect_peak_trough_count_orig"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_count_orig">[docs]</a>    <span class="k">def</span> <span class="nf">detect_peak_trough_count_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        Method 2: using local extreme technique with threshold</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s :</span>
+<span class="sd">            Input signal</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        type</span>
+<span class="sd">            tuple of 1-D numpy array</span>
+<span class="sd">            the first array is the peak list</span>
+<span class="sd">            and the second array is the troughs list</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># squaring decrease the efficiency</span>
+        <span class="c1"># s = np.array(s)**2</span>
+
+        <span class="n">local_maxima</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">argrelmax</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">local_minima</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">argrelmin</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">peak_threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">local_maxima</span><span class="p">],</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.2</span>
+        <span class="n">trough_threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">local_minima</span><span class="p">],</span> <span class="mf">0.25</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.2</span>
+
+        <span class="n">peak_shortlist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">optima</span> <span class="k">for</span> <span class="n">optima</span> <span class="ow">in</span> <span class="n">local_maxima</span>
+                                   <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">optima</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">peak_threshold</span><span class="p">])</span>
+        <span class="n">trough_shortlist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">optima</span> <span class="k">for</span> <span class="n">optima</span> <span class="ow">in</span> <span class="n">local_minima</span>
+                                     <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">optima</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">trough_threshold</span><span class="p">])</span>
+
+        <span class="n">peak_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">through_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">left_trough</span> <span class="o">=</span> <span class="n">trough_shortlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trough_shortlist</span><span class="p">)):</span>
+
+            <span class="n">right_trough</span> <span class="o">=</span> <span class="n">trough_shortlist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">peaks</span> <span class="o">=</span> <span class="p">[</span><span class="n">peak</span> <span class="k">for</span> <span class="n">peak</span> <span class="ow">in</span> <span class="n">peak_shortlist</span>
+                     <span class="k">if</span> <span class="n">peak</span> <span class="o">&lt;</span> <span class="n">right_trough</span> <span class="ow">and</span> <span class="n">peak</span> <span class="o">&gt;</span> <span class="n">left_trough</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">left_trough</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">left_trough</span><span class="p">,</span> <span class="n">right_trough</span><span class="p">])</span>
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">([</span><span class="n">s</span><span class="p">[</span><span class="n">left_trough</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="n">right_trough</span><span class="p">]])]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">peak</span> <span class="o">=</span> <span class="n">peaks</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">peaks</span><span class="p">])]</span>
+                <span class="n">peak_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
+                <span class="n">through_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">left_trough</span><span class="p">)</span>
+                <span class="n">left_trough</span> <span class="o">=</span> <span class="n">right_trough</span>
+        <span class="n">through_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">right_trough</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">through_finalist</span></div>
+
+<div class="viewcode-block" id="PeakDetector.detect_peak_trough_slope_sum"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_slope_sum">[docs]</a>    <span class="k">def</span> <span class="nf">detect_peak_trough_slope_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        Method 3: analyze the slope sum to get local extreme</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s :</span>
+<span class="sd">            return:</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">peak_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">trough_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">onset_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Here w is the length of the analysing window, which Zong et al. [25]</span>
+<span class="sd">        approximate to be equal to 128 ms or 47 samples</span>
+<span class="sd">        for the sampling frequency (fs) of 367 Hz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="mi">12</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">w</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">n_range</span><span class="p">:</span>
+            <span class="n">Zk</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">n</span> <span class="o">-</span> <span class="n">w</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+                <span class="n">delta_y_k</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">s</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">Zk</span> <span class="o">=</span> <span class="n">Zk</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">delta_y_k</span><span class="p">)</span>
+            <span class="n">Z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Zk</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">Z_threshold</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Z</span><span class="p">[:</span><span class="mi">10</span> <span class="o">*</span> <span class="n">fs</span><span class="p">])</span>
+        <span class="n">threshold_base</span> <span class="o">=</span> <span class="n">Z_threshold</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Z</span><span class="p">)):</span>
+            <span class="n">actual_threshold</span> <span class="o">=</span> <span class="n">threshold_base</span> <span class="o">*</span> <span class="mf">0.6</span>
+            <span class="k">if</span> <span class="n">Z</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">actual_threshold</span><span class="p">:</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">15</span>
+                <span class="n">right</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">15</span>
+                <span class="k">if</span> <span class="n">left</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">right</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">Z</span><span class="p">):</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+                <span class="n">local_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">])</span>
+                <span class="n">local_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">])</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">local_max</span> <span class="o">-</span> <span class="n">local_min</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">local_min</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="c1"># Accept the pulse</span>
+                    <span class="n">threshold_crossing_point</span> <span class="o">=</span> <span class="n">n</span>
+                    <span class="n">onset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_for_onset</span><span class="p">(</span>
+                        <span class="n">Z</span><span class="p">,</span> <span class="n">threshold_crossing_point</span><span class="p">,</span> <span class="n">local_max</span><span class="p">)</span>
+                    <span class="n">onset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">onset</span><span class="p">)</span>
+                    <span class="c1"># peak_finalist.append(threshold_crossing_point+np.argmax())</span>
+                <span class="c1"># maximum Z[n] value for each pulse detected</span>
+                <span class="n">threshold_base</span> <span class="o">=</span> <span class="n">local_max</span>  <span class="c1"># ?????</span>
+
+        <span class="n">onset_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">onset_list</span><span class="p">)))</span>
+        <span class="n">onset_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trough_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">onset_list</span><span class="p">)):</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">onset_list</span><span class="p">[</span><span class="n">trough_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">onset_list</span><span class="p">[</span><span class="n">trough_idx</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">peak_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">])</span> <span class="o">+</span> <span class="n">left</span><span class="p">)</span>
+                <span class="n">trough_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">])</span> <span class="o">+</span> <span class="n">left</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">onset_list</span></div>
+
+<div class="viewcode-block" id="PeakDetector.search_for_onset"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.search_for_onset">[docs]</a>    <span class="k">def</span> <span class="nf">search_for_onset</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">local_max</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Z :</span>
+
+<span class="sd">        idx :</span>
+
+<span class="sd">        local_max :</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># while Z[idx] &gt; 0.01*local_max:</span>
+        <span class="k">while</span> <span class="n">Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">idx</span>
+        <span class="k">return</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="PeakDetector.detect_peak_trough_moving_average_threshold"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_moving_average_threshold">[docs]</a>    <span class="k">def</span> <span class="nf">detect_peak_trough_moving_average_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        Method 4 (examine second derivative)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s :</span>
+<span class="sd">            return:</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">peak_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">through_finalist</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Bandpass filter</span>
+        <span class="nb">filter</span> <span class="o">=</span> <span class="n">BandpassFilter</span><span class="p">()</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">signal_highpass_filter</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="c1"># S = butter_lowpass_filter(S,8,fs=100)</span>
+        <span class="c1"># S = s</span>
+        <span class="c1"># Clipping the output by keeping the signal</span>
+        <span class="c1"># above zero will produce signal Z</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">S</span><span class="p">])</span>
+        <span class="c1"># Squaring suppressing the small differences</span>
+        <span class="c1"># arising from the diastolic wave and noise</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">Z</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="n">w1</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># 111ms</span>
+        <span class="n">w2</span> <span class="o">=</span> <span class="mi">67</span>  <span class="c1"># 678ms</span>
+        <span class="c1"># MA_peak</span>
+        <span class="n">ma_peak</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_moving_average</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">w1</span><span class="p">)</span>
+        <span class="c1"># MA_beat</span>
+        <span class="n">ma_beat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_moving_average</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">w2</span><span class="p">)</span>
+        <span class="c1"># Thresholding</span>
+        <span class="n">z_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.02</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">z_mean</span> <span class="o">+</span> <span class="n">ma_beat</span>
+        <span class="n">thr1</span> <span class="o">=</span> <span class="n">ma_beat</span> <span class="o">+</span> <span class="n">alpha</span>
+        <span class="n">block_of_interest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">thr1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ma_peak</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">ma_peak</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thr1</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">block_of_interest</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="c1"># Accept and Reject block of interest</span>
+        <span class="c1"># If a block is wider than or equal to THR2,</span>
+        <span class="c1"># it is classified as a systolic peak</span>
+        <span class="n">thr2</span> <span class="o">=</span> <span class="n">w1</span>
+        <span class="c1"># index of the signal having boi == 0.1</span>
+        <span class="n">BOI_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">block_of_interest</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># the different of consequence BOI</span>
+        <span class="n">BOI_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">BOI_idx</span><span class="p">)</span>
+        <span class="c1"># index where the block move to other block</span>
+        <span class="n">BOI_width_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">BOI_diff</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">BOI_width_idx</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">BOI_width</span> <span class="o">=</span> <span class="n">BOI_width_idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">BOI_width</span> <span class="o">=</span> <span class="n">BOI_width_idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">BOI_width_idx</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">BOI_width</span> <span class="o">&gt;=</span> <span class="n">thr2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">left_idx</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">left_idx</span> <span class="o">=</span> <span class="n">BOI_width_idx</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="c1"># left_idx = BOI_width_idx[np.max([0,i-1])]</span>
+                <span class="n">right_idx</span> <span class="o">=</span> <span class="n">BOI_width_idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">region</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">BOI_idx</span><span class="p">[</span><span class="n">left_idx</span><span class="p">]:</span><span class="n">BOI_idx</span><span class="p">[</span><span class="n">right_idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">peak_finalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BOI_idx</span><span class="p">[</span><span class="n">left_idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">region</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">peak_finalist</span><span class="p">,</span> <span class="n">through_finalist</span></div>
+
+<div class="viewcode-block" id="PeakDetector.get_moving_average"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.rpeak_detection.PeakDetector.get_moving_average">[docs]</a>    <span class="k">def</span> <span class="nf">get_moving_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        handy</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        q :</span>
+
+<span class="sd">        w :</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># shifting = np.ceil(w-w/2)-1</span>
+        <span class="c1"># remaining = w-1-shifting</span>
+        <span class="n">q_padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">w</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">)</span>
+        <span class="n">convole</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">q_padded</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">/</span> <span class="n">w</span><span class="p">,</span> <span class="s1">&#39;valid&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">convole</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

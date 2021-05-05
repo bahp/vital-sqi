@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.data.segment_split &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vital_sqi.data.segment_split</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vital_sqi.data.segment_split</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; Splitting long recordings into segments&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">vital_sqi.data.removal_utilities</span> <span class="kn">import</span> <span class="n">remove_invalid</span><span class="p">,</span><span class="n">trim_data</span>
+<span class="kn">from</span> <span class="nn">vital_sqi.common.rpeak_detection</span> <span class="kn">import</span> <span class="n">PeakDetector</span>
+
+<div class="viewcode-block" id="save_segment_image"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.segment_split.save_segment_image">[docs]</a><span class="k">def</span> <span class="nf">save_segment_image</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span><span class="n">saved_filename</span><span class="p">,</span><span class="n">save_img_folder</span><span class="p">,</span><span class="n">display_trough_peak</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    :param segment:</span>
+<span class="sd">    :param saved_filename:</span>
+<span class="sd">    :param save_img_folder:</span>
+<span class="sd">    :param display_trough_peak:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_traces</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">segment</span><span class="p">)),</span>
+                              <span class="n">y</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">display_trough_peak</span><span class="p">:</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">PeakDetector</span><span class="p">()</span>
+        <span class="n">systolic_peaks_idx</span><span class="p">,</span> <span class="n">trough_idx</span> <span class="o">=</span> <span class="n">wave</span><span class="o">.</span><span class="n">detect_peak_trough_count_orig</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_traces</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">systolic_peaks_idx</span><span class="p">,</span>
+                                  <span class="n">y</span><span class="o">=</span><span class="n">segment</span><span class="p">[</span><span class="n">systolic_peaks_idx</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">))</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_traces</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">trough_idx</span><span class="p">,</span>
+                                  <span class="n">y</span><span class="o">=</span><span class="n">segment</span><span class="p">[</span><span class="n">trough_idx</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">))</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">autosize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_img_folder</span><span class="p">,</span> <span class="n">saved_filename</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="save_each_segment"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.segment_split.save_each_segment">[docs]</a><span class="k">def</span> <span class="nf">save_each_segment</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">segment_list</span><span class="p">,</span><span class="n">save_file_folder</span><span class="p">,</span>
+                      <span class="n">save_image</span><span class="p">,</span><span class="n">save_img_folder</span><span class="p">,</span><span class="n">display_trough_peak</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save each n-second segment into csv and the relevant image</span>
+<span class="sd">    :param filename: str, the origin file name</span>
+<span class="sd">    :param segment_list: list, the list all split 30-second segments</span>
+<span class="sd">    :param display_trough_peak: bool, default = False, display to trough and peak in the saved images</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">extension_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segment_list</span><span class="p">)))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">segment_list</span><span class="p">):</span>
+        <span class="n">zero_adding</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;0&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">extension_len</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">saved_filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">+</span><span class="s2">&quot;-&quot;</span><span class="o">+</span><span class="n">zero_adding</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">save_image</span><span class="p">:</span>
+                <span class="n">save_segment_image</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">saved_filename</span><span class="p">,</span> <span class="n">save_img_folder</span><span class="p">,</span> <span class="n">display_trough_peak</span><span class="p">)</span>
+
+            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_file_folder</span><span class="p">,</span> <span class="n">saved_filename</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">),</span> <span class="n">segment</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>  <span class="c1"># as an array</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="split_to_subsegments"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.segment_split.split_to_subsegments">[docs]</a><span class="k">def</span> <span class="nf">split_to_subsegments</span><span class="p">(</span><span class="n">signal_data</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+                         <span class="n">segment_length_second</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span><span class="n">minute_remove</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+                         <span class="n">wave_type</span><span class="o">=</span><span class="s2">&quot;ecg&quot;</span><span class="p">,</span><span class="n">split_type</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span>
+                         <span class="n">is_trim</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">save_file_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">save_image</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">save_img_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">display_trough_peak</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expose</span>
+<span class="sd">    Split the data after applying bandpass filter and removing the first and last n-minutes</span>
+<span class="sd">    (High pass filter with cutoff at 1Hz)</span>
+<span class="sd">    The signal is split according to time domain - default is 30s</span>
+<span class="sd">    :param filename: str, path to load file</span>
+<span class="sd">    :param sampling_rate:float, default = 100.0. The sampling rate of the wearable device</span>
+<span class="sd">    :param segment_length:float, default = 30.0. The length of the segment (in seconds)</span>
+<span class="sd">    :param minute_remove: float, default = 5.0. The first and last of n-minutes to be removed</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;segment&#39;</span>
+    <span class="k">if</span> <span class="n">save_file_folder</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">save_file_folder</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+    <span class="n">save_file_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_file_folder</span><span class="p">,</span> <span class="n">wave_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_file_folder</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_file_folder</span><span class="p">)</span>
+
+    <span class="k">if</span>  <span class="n">save_image</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">save_img_folder</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">save_img_folder</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">save_img_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_img_folder</span><span class="p">,</span> <span class="s2">&quot;img&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_img_folder</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_img_folder</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_trim</span><span class="p">:</span>
+        <span class="n">signal_data</span> <span class="o">=</span> <span class="n">trim_data</span><span class="p">(</span><span class="n">signal_data</span><span class="p">,</span><span class="n">minute_remove</span><span class="p">,</span><span class="n">sampling_rate</span><span class="p">)</span>
+
+    <span class="n">start_milestone</span><span class="p">,</span> <span class="n">end_milestone</span> <span class="o">=</span> <span class="n">remove_invalid</span><span class="p">(</span><span class="n">signal_data</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">segments</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">start_milestone</span><span class="p">,</span> <span class="n">end_milestone</span><span class="p">):</span>
+        <span class="n">segment_seconds</span> <span class="o">=</span> <span class="n">segment_length_second</span> <span class="o">*</span> <span class="n">sampling_rate</span>
+        <span class="n">sub_signal_data</span> <span class="o">=</span> <span class="n">signal_data</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">split_type</span> <span class="o">==</span> <span class="s1">&#39;peak_interval&#39;</span><span class="p">:</span>
+            <span class="n">chunk_indices</span> <span class="o">=</span> <span class="n">get_split_rr_index</span><span class="p">(</span><span class="n">segment_seconds</span><span class="p">,</span><span class="n">sub_signal_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chunk_indices</span> <span class="o">=</span> <span class="n">get_split_time_index</span><span class="p">(</span><span class="n">segment_seconds</span><span class="p">,</span> <span class="n">sub_signal_data</span><span class="p">)</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="n">segments</span> <span class="o">+</span> <span class="p">[</span><span class="n">sub_signal_data</span><span class="p">[</span><span class="n">chunk_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">chunk_indices</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
+                               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk_indices</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="n">save_each_segment</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span><span class="n">save_file_folder</span><span class="p">,</span>
+                      <span class="n">save_image</span><span class="p">,</span><span class="n">save_img_folder</span><span class="p">,</span><span class="n">display_trough_peak</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_split_time_index"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.segment_split.get_split_time_index">[docs]</a><span class="k">def</span> <span class="nf">get_split_time_index</span><span class="p">(</span><span class="n">segment_seconds</span><span class="p">,</span><span class="n">sequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    Return the index of splitting points</span>
+<span class="sd">    :param segment_seconds: the length of each cut split (in seconds)</span>
+<span class="sd">    :param sequence:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">segment_seconds</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
+               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">/</span> <span class="n">segment_seconds</span><span class="p">)))]</span>
+    <span class="k">return</span> <span class="n">indices</span></div>
+
+<div class="viewcode-block" id="get_split_rr_index"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.segment_split.get_split_rr_index">[docs]</a><span class="k">def</span> <span class="nf">get_split_rr_index</span><span class="p">(</span><span class="n">segment_seconds</span><span class="p">,</span><span class="n">sequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    Return the index of the splitting points</span>
+<span class="sd">    :param segment_seconds: the length of each cut split (in seconds)</span>
+<span class="sd">    :param sequence:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">PeakDetector</span><span class="p">()</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">/</span> <span class="n">segment_seconds</span><span class="p">))):</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">segment_seconds</span> <span class="o">*</span> <span class="n">i</span><span class="p">):</span>
+                         <span class="nb">int</span><span class="p">(</span><span class="n">segment_seconds</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">60</span><span class="p">)]</span>
+        <span class="n">peak_list</span><span class="p">,</span> <span class="n">trough_list</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">ppg_detector</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trough_list</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">trough_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">segment_seconds</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">segment_seconds</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">indices</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

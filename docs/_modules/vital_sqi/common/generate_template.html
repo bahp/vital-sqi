@@ -1,0 +1,516 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.common.generate_template &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vital_sqi.common.generate_template</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vital_sqi.common.generate_template</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Generating templates of ECG and PPG complexes&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">erf</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">argrelextrema</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">solve_ivp</span>
+<span class="kn">from</span> <span class="nn">vital_sqi.preprocess.preprocess_signal</span> <span class="kn">import</span> <span class="n">squeeze_template</span>
+
+
+<div class="viewcode-block" id="ppg_dual_double_frequency_template"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.ppg_dual_double_frequency_template">[docs]</a><span class="k">def</span> <span class="nf">ppg_dual_double_frequency_template</span><span class="p">(</span><span class="n">width</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    EXPOSE</span>
+<span class="sd">    Generate a PPG template by using 2 sine waveforms.</span>
+<span class="sd">    The first waveform double the second waveform frequency</span>
+<span class="sd">    :param width: the sample size of the generated waveform</span>
+<span class="sd">    :return: a 1-D numpy array of PPG waveform</span>
+<span class="sd">    having diastolic peak at the low position</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>  <span class="c1"># 1 second</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="n">sig_scale</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sig_scale</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="skew_func"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.skew_func">[docs]</a><span class="k">def</span> <span class="nf">skew_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    :param x: input sequence of time points</span>
+<span class="sd">    :param e: location</span>
+<span class="sd">    :param w: scale</span>
+<span class="sd">    :param a: the order</span>
+<span class="sd">    :return: a 1-D numpy array of a skewness distribution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="n">w</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">erf</span><span class="p">((</span><span class="n">a</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">gaussian_dist</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">w</span> <span class="o">*</span> <span class="n">gaussian_dist</span> <span class="o">*</span> <span class="n">omega</span></div>
+
+
+<div class="viewcode-block" id="ppg_absolute_dual_skewness_template"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.ppg_absolute_dual_skewness_template">[docs]</a><span class="k">def</span> <span class="nf">ppg_absolute_dual_skewness_template</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">e_1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                        <span class="n">w_1</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">e_2</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                        <span class="n">w_2</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    EXPOSE</span>
+<span class="sd">    Generate a PPG template by using 2 skewness distribution.</span>
+<span class="sd">    :param width: the sample size of the generated waveform</span>
+<span class="sd">    :param e_1: the epsilon location of the first skew distribution</span>
+<span class="sd">    :param w_1: the scale of the first skew distribution</span>
+<span class="sd">    :param e_2: the epsilon location of the second skew distribution</span>
+<span class="sd">    :param w_2: the scale of the second skew distribution</span>
+<span class="sd">    :param a: the order</span>
+<span class="sd">    :return: a 1-D numpy array of PPG waveform</span>
+<span class="sd">    having diastolic peak at the high position</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">p_1</span> <span class="o">=</span> <span class="n">skew_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">e_1</span><span class="p">,</span> <span class="n">w_1</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">p_2</span> <span class="o">=</span> <span class="n">skew_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">e_2</span><span class="p">,</span> <span class="n">w_2</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">p_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">p_1</span><span class="p">,</span> <span class="n">p_2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">sig_scale</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p_</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sig_scale</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ppg_nonlinear_dynamic_system_template"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.ppg_nonlinear_dynamic_system_template">[docs]</a><span class="k">def</span> <span class="nf">ppg_nonlinear_dynamic_system_template</span><span class="p">(</span><span class="n">width</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    EXPOSE</span>
+<span class="sd">    :param width:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="mf">0.15</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="mf">0.15</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">gamma1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.25</span>
+    <span class="n">gamma2</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">x1_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x1</span><span class="p">]</span>
+    <span class="n">x2_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x2</span><span class="p">]</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">dx1</span> <span class="o">=</span> <span class="o">-</span><span class="n">x1</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">y2</span> <span class="o">+</span> <span class="n">gamma1</span>
+        <span class="n">dx2</span> <span class="o">=</span> <span class="o">-</span><span class="n">x2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">y2</span> <span class="o">+</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">gamma2</span>
+
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">dx1</span> <span class="o">*</span> <span class="n">dt</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">x2</span> <span class="o">+</span> <span class="n">dx2</span> <span class="o">*</span> <span class="n">dt</span>
+
+        <span class="n">x1_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+        <span class="n">x2_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+
+    <span class="n">local_minima</span> <span class="o">=</span> <span class="n">argrelextrema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_list</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_list</span><span class="p">[</span><span class="n">local_minima</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span><span class="n">local_minima</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">rescale_signal</span> <span class="o">=</span> <span class="n">squeeze_template</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+
+    <span class="n">window</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">cosine</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rescale_signal</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">signal_data_tapered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">window</span><span class="p">)</span> <span class="o">*</span> \
+        <span class="p">(</span><span class="n">rescale_signal</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">rescale_signal</span><span class="p">))</span>
+
+    <span class="n">out_scale</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">signal_data_tapered</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out_scale</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="interp"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.interp">[docs]</a><span class="k">def</span> <span class="nf">interp</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">mul</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy func</span>
+<span class="sd">    :param ys:</span>
+<span class="sd">    :param mul:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># linear extrapolation for last (mul - 1) points</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+    <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ys</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># make interpolation function</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">))</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">)</span>
+    <span class="c1"># call it on desired data points</span>
+    <span class="n">new_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">mul</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">new_xs</span><span class="p">)</span></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Equation (3) from the paper</span>
+<span class="sd">A dynamical model for generating synthetic electrocardiogram signals</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="ecg_dynamic_template"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.ecg_dynamic_template">[docs]</a><span class="k">def</span> <span class="nf">ecg_dynamic_template</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">sfecg</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">Anoise</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hrmean</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                         <span class="n">hrstd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lfhfratio</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sfint</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                         <span class="n">ti</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">70</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">100</span><span class="p">]),</span>
+                         <span class="n">ai</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="o">-</span><span class="mf">7.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]),</span>
+                         <span class="n">bi</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+                         <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    EXPOSE</span>
+<span class="sd">    :param width:</span>
+<span class="sd">    :param sfecg:</span>
+<span class="sd">    :param N:</span>
+<span class="sd">    :param Anoise:</span>
+<span class="sd">    :param hrmean:</span>
+<span class="sd">    :param hrstd:</span>
+<span class="sd">    :param lfhfratio:</span>
+<span class="sd">    :param sfint:</span>
+<span class="sd">    :param ti:</span>
+<span class="sd">    :param ai:</span>
+<span class="sd">    :param bi:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># convert to radians</span>
+    <span class="n">ti</span> <span class="o">=</span> <span class="n">ti</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+
+    <span class="c1"># adjust extrema parameters for mean heart rate</span>
+    <span class="n">hrfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">hrmean</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">hrfact2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">hrfact</span><span class="p">)</span>
+    <span class="n">bi</span> <span class="o">=</span> <span class="n">hrfact</span> <span class="o">*</span> <span class="n">bi</span>
+    <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">([</span><span class="n">hrfact2</span><span class="p">,</span> <span class="n">hrfact</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">hrfact</span><span class="p">,</span> <span class="n">hrfact2</span><span class="p">],</span> <span class="n">ti</span><span class="p">)</span>
+
+    <span class="n">flo</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">fhi</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">flostd</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">fhistd</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+    <span class="c1"># calculate time scales for rr and total output</span>
+    <span class="n">sampfreqrr</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">trr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">sampfreqrr</span>
+    <span class="n">rrmean</span> <span class="o">=</span> <span class="p">(</span><span class="mi">60</span> <span class="o">/</span> <span class="n">hrmean</span><span class="p">)</span>
+    <span class="n">Nrr</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">rrmean</span> <span class="o">/</span> <span class="n">trr</span><span class="p">)))</span>
+
+    <span class="n">rr0</span> <span class="o">=</span> <span class="n">rr_process</span><span class="p">(</span><span class="n">flo</span><span class="p">,</span> <span class="n">fhi</span><span class="p">,</span> <span class="n">flostd</span><span class="p">,</span> <span class="n">fhistd</span><span class="p">,</span>
+                     <span class="n">lfhfratio</span><span class="p">,</span> <span class="n">hrmean</span><span class="p">,</span> <span class="n">hrstd</span><span class="p">,</span> <span class="n">sampfreqrr</span><span class="p">,</span> <span class="n">Nrr</span><span class="p">)</span>
+
+    <span class="c1"># upsample rr time series from 1 Hz to sfint Hz</span>
+    <span class="n">rr</span> <span class="o">=</span> <span class="n">interp</span><span class="p">(</span><span class="n">rr0</span><span class="p">,</span> <span class="n">sfint</span><span class="p">)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">sfint</span>
+    <span class="n">rrn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rr</span><span class="p">))</span>
+    <span class="n">tecg</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rr</span><span class="p">):</span>
+        <span class="n">tecg</span> <span class="o">=</span> <span class="n">tecg</span> <span class="o">+</span> <span class="n">rr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">tecg</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span>
+        <span class="n">rrn</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">ip</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">ip</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">Nt</span> <span class="o">=</span> <span class="n">ip</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">]</span>
+    <span class="n">tspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">Nt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">rrn</span><span class="p">,</span> <span class="n">sfint</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">ai</span><span class="p">,</span> <span class="n">bi</span><span class="p">)</span>
+    <span class="n">solv_ode</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ordinary_differential_equation</span><span class="p">,</span> <span class="p">[</span><span class="n">tspan</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tspan</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                         <span class="n">x0</span><span class="p">,</span> <span class="n">t_eval</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">20.5</span><span class="p">,</span> <span class="mf">21.5</span><span class="p">,</span> <span class="mf">0.00001</span><span class="p">),</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">solv_ode</span><span class="o">.</span><span class="n">y</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># if len(Y) &gt; width:</span>
+    <span class="c1">#     z = squeeze_template(Y,125)</span>
+    <span class="k">return</span> <span class="n">Y</span></div>
+
+
+<div class="viewcode-block" id="ordinary_differential_equation"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.ordinary_differential_equation">[docs]</a><span class="k">def</span> <span class="nf">ordinary_differential_equation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x_equations</span><span class="p">,</span> <span class="n">rr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                   <span class="n">sfint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ti</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ai</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    :param t:</span>
+<span class="sd">    :param x_equations:</span>
+<span class="sd">    :param rr:</span>
+<span class="sd">    :param sfint:</span>
+<span class="sd">    :param ti:</span>
+<span class="sd">    :param ai:</span>
+<span class="sd">    :param bi:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x_equations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">x_equations</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x_equations</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">ta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">r0</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">a0</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">r0</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">sfint</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">rr</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">rr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">fresp</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">zbase</span> <span class="o">=</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">fresp</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="n">dx1dt</span> <span class="o">=</span> <span class="n">a0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">w0</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="n">dx2dt</span> <span class="o">=</span> <span class="n">a0</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">w0</span> <span class="o">*</span> <span class="n">x</span>
+
+    <span class="n">dti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fmod</span><span class="p">(</span><span class="n">ta</span> <span class="o">-</span> <span class="n">ti</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">dx3dt</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ai</span> <span class="o">*</span> <span class="n">dti</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">dti</span><span class="p">,</span> <span class="n">bi</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">dx3dt</span> <span class="o">=</span> <span class="n">dx3dt</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">zbase</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">dx1dt</span><span class="p">,</span> <span class="n">dx2dt</span><span class="p">,</span> <span class="n">dx3dt</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="rr_process"><a class="viewcode-back" href="../../../vital_sqi.common.html#vital_sqi.common.generate_template.rr_process">[docs]</a><span class="k">def</span> <span class="nf">rr_process</span><span class="p">(</span><span class="n">flo</span><span class="p">,</span> <span class="n">fhi</span><span class="p">,</span> <span class="n">flostd</span><span class="p">,</span> <span class="n">fhistd</span><span class="p">,</span> <span class="n">lfhfratio</span><span class="p">,</span> <span class="n">hrmean</span><span class="p">,</span> <span class="n">hrstd</span><span class="p">,</span> <span class="n">sfrr</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    :param flo:</span>
+<span class="sd">    :param fhi:</span>
+<span class="sd">    :param flostd:</span>
+<span class="sd">    :param fhistd:</span>
+<span class="sd">    :param lfhfratio:</span>
+<span class="sd">    :param hrmean:</span>
+<span class="sd">    :param hrstd:</span>
+<span class="sd">    :param sfrr:</span>
+<span class="sd">    :param n:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">w1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">flo</span>
+    <span class="n">w2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">fhi</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">flostd</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">fhistd</span>
+    <span class="n">sig2</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">sig1</span> <span class="o">=</span> <span class="n">lfhfratio</span>
+    <span class="n">rrmean</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">/</span> <span class="n">hrmean</span>
+    <span class="n">rrstd</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">hrstd</span> <span class="o">/</span> <span class="p">(</span><span class="n">hrmean</span> <span class="o">*</span> <span class="n">hrmean</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generating RR-intervals which have a bimodal power spectrum</span>
+<span class="sd">    consisting of the sum of two Gaussian distributions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">sfrr</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">df</span>
+    <span class="n">dw1</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="n">w1</span>
+    <span class="n">dw2</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="n">w2</span>
+
+    <span class="n">Hw1</span> <span class="o">=</span> <span class="n">sig1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">dw1</span> <span class="o">/</span> <span class="n">c1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> \
+        <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">Hw2</span> <span class="o">=</span> <span class="n">sig2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">dw2</span> <span class="o">/</span> <span class="n">c2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> \
+        <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">Hw</span> <span class="o">=</span> <span class="n">Hw1</span> <span class="o">+</span> <span class="n">Hw2</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An RR-interval time series T(t)</span>
+<span class="sd">    with power spectrum is S(f)</span>
+<span class="sd">    generated by taking the inverse Fourier transform of</span>
+<span class="sd">    a sequence of complex numbers with amplitudes sqrt(S(f))</span>
+<span class="sd">    and phases which are randomly distributed between 0 and 2pi</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Hw0_half</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Hw</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)])</span>
+    <span class="n">Hw0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hw0_half</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Hw0_half</span><span class="p">))</span>
+    <span class="n">Sw</span> <span class="o">=</span> <span class="p">(</span><span class="n">sfrr</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hw0</span> <span class="o">**</span> <span class="mf">.5</span><span class="p">)</span>
+
+    <span class="n">ph0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># ph0 = 2 * np.pi * 0.001*np.arange(127).reshape(-1,1)</span>
+    <span class="n">ph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">ph0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">ph0</span><span class="p">)))</span>
+
+    <span class="c1"># create the complex number</span>
+    <span class="n">SwC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">Sw</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ph</span><span class="p">))</span>
+    <span class="n">inverse_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">SwC</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">inverse_res</span><span class="p">)</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        By multiplying this time series by an appropriate scaling constant</span>
+<span class="sd">        and adding an offset value, the resulting time series can be given</span>
+<span class="sd">        any required mean and standard deviation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xstd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">rrstd</span> <span class="o">/</span> <span class="n">xstd</span>
+    <span class="n">rr</span> <span class="o">=</span> <span class="n">rrmean</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">ratio</span>
+    <span class="k">return</span> <span class="n">rr</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

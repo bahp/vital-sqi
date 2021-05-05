@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.common package &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>vital_sqi.common package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/vital_sqi.common.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vital-sqi-common-package">
+<h1>vital_sqi.common package<a class="headerlink" href="#vital-sqi-common-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vital_sqi.common.generate_template">
+<span id="vital-sqi-common-generate-template-module"></span><h2>vital_sqi.common.generate_template module<a class="headerlink" href="#module-vital_sqi.common.generate_template" title="Permalink to this headline">¶</a></h2>
+<p>Generating templates of ECG and PPG complexes</p>
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.ecg_dynamic_template">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">ecg_dynamic_template</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sfecg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Anoise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hrmean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hrstd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lfhfratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sfint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ti</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([-</span> <span class="pre">70,</span> <span class="pre">-</span> <span class="pre">15,</span> <span class="pre">0,</span> <span class="pre">15,</span> <span class="pre">100])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ai</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([1.2,</span> <span class="pre">-</span> <span class="pre">5.,</span> <span class="pre">30.,</span> <span class="pre">-</span> <span class="pre">7.5,</span> <span class="pre">0.75])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.25,</span> <span class="pre">0.1,</span> <span class="pre">0.1,</span> <span class="pre">0.1,</span> <span class="pre">0.4])</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#ecg_dynamic_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.ecg_dynamic_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXPOSE
+:param width:
+:param sfecg:
+:param N:
+:param Anoise:
+:param hrmean:
+:param hrstd:
+:param lfhfratio:
+:param sfint:
+:param ti:
+:param ai:
+:param bi:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.interp">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">interp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mul</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#interp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.interp" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy func
+:param ys:
+:param mul:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.ordinary_differential_equation">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">ordinary_differential_equation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_equations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sfint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ti</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ai</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#ordinary_differential_equation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.ordinary_differential_equation" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param t:
+:param x_equations:
+:param rr:
+:param sfint:
+:param ti:
+:param ai:
+:param bi:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.ppg_absolute_dual_skewness_template">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">ppg_absolute_dual_skewness_template</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#ppg_absolute_dual_skewness_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.ppg_absolute_dual_skewness_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXPOSE
+Generate a PPG template by using 2 skewness distribution.
+:param width: the sample size of the generated waveform
+:param e_1: the epsilon location of the first skew distribution
+:param w_1: the scale of the first skew distribution
+:param e_2: the epsilon location of the second skew distribution
+:param w_2: the scale of the second skew distribution
+:param a: the order
+:return: a 1-D numpy array of PPG waveform
+having diastolic peak at the high position</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.ppg_dual_double_frequency_template">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">ppg_dual_double_frequency_template</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#ppg_dual_double_frequency_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.ppg_dual_double_frequency_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXPOSE
+Generate a PPG template by using 2 sine waveforms.
+The first waveform double the second waveform frequency
+:param width: the sample size of the generated waveform
+:return: a 1-D numpy array of PPG waveform
+having diastolic peak at the low position</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.ppg_nonlinear_dynamic_system_template">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">ppg_nonlinear_dynamic_system_template</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#ppg_nonlinear_dynamic_system_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.ppg_nonlinear_dynamic_system_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>EXPOSE
+:param width:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.rr_process">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">rr_process</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fhi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flostd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fhistd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lfhfratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hrmean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hrstd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sfrr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#rr_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.rr_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param flo:
+:param fhi:
+:param flostd:
+:param fhistd:
+:param lfhfratio:
+:param hrmean:
+:param hrstd:
+:param sfrr:
+:param n:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vital_sqi.common.generate_template.skew_func">
+<code class="sig-prename descclassname"><span class="pre">vital_sqi.common.generate_template.</span></code><code class="sig-name descname"><span class="pre">skew_func</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/generate_template.html#skew_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.generate_template.skew_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param x: input sequence of time points
+:param e: location
+:param w: scale
+:param a: the order
+:return: a 1-D numpy array of a skewness distribution</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vital_sqi.common.rpeak_detection">
+<span id="vital-sqi-common-rpeak-detection-module"></span><h2>vital_sqi.common.rpeak_detection module<a class="headerlink" href="#module-vital_sqi.common.rpeak_detection" title="Permalink to this headline">¶</a></h2>
+<p>R peak detection approaches for PPG and ECG</p>
+<dl class="py class">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vital_sqi.common.rpeak_detection.</span></code><code class="sig-name descname"><span class="pre">PeakDetector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ppg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Various peak detection approaches getting from the paper
+Systolic Peak Detection in Acceleration Photoplethysmograms Measured
+from Emergency Responders in Tropical Conditions</p>
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.compute_feature">
+<code class="sig-name descname"><span class="pre">compute_feature</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_extrema</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.compute_feature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.compute_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param s:
+:param local_extrema:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_adaptive_threshold">
+<code class="sig-name descname"><span class="pre">detect_peak_trough_adaptive_threshold</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sliding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.detect_peak_trough_adaptive_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_adaptive_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>adaptive_size</strong> – </p></li>
+<li><p><strong>overlap</strong> – overlapping ratio</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_clusterer">
+<code class="sig-name descname"><span class="pre">detect_peak_trough_clusterer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kmean'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.detect_peak_trough_clusterer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_clusterer" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+Method 1: using clustering technique</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – The input signals</p></li>
+<li><p><strong>method</strong> – param kwargs:</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple of 1-D numpy array
+the first array is the peak list
+and the second array is the troughs list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_count_orig">
+<code class="sig-name descname"><span class="pre">detect_peak_trough_count_orig</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.detect_peak_trough_count_orig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_count_orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+Method 2: using local extreme technique with threshold</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> – Input signal</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple of 1-D numpy array
+the first array is the peak list
+and the second array is the troughs list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_default_scipy">
+<code class="sig-name descname"><span class="pre">detect_peak_trough_default_scipy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.detect_peak_trough_default_scipy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_default_scipy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_moving_average_threshold">
+<code class="sig-name descname"><span class="pre">detect_peak_trough_moving_average_threshold</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.detect_peak_trough_moving_average_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_moving_average_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+Method 4 (examine second derivative)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> – return:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_slope_sum">
+<code class="sig-name descname"><span class="pre">detect_peak_trough_slope_sum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.detect_peak_trough_slope_sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.detect_peak_trough_slope_sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+Method 3: analyze the slope sum to get local extreme</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> – return:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.ecg_detector">
+<code class="sig-name descname"><span class="pre">ecg_detector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pan_tompkins'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.ecg_detector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.ecg_detector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expose</p>
+<p>ECG peak detector from the github
+<a class="reference external" href="https://github.com/berndporr/py-ecg-detectors">https://github.com/berndporr/py-ecg-detectors</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – Input signal</p></li>
+<li><p><strong>fs</strong> – The signal frequency. Default is ‘256 Hz’</p></li>
+<li><p><strong>detector_type</strong> – <p>‘hamilton’: Open Source ECG Analysis Software Documentation,
+E.P.Limited, 2002.</p>
+<p>’christov’:Real time electrocardiogram QRS detection using combined
+adaptive threshold</p>
+<p>’engzee’: A single scan algorithm for QRS detection and
+feature extraction</p>
+<p>’swt’: Real-time QRS detector using Stationary Wavelet Transform
+for Automated ECG Analysis.
+Uses the Pan and Tompkins thresolding.</p>
+<p>’mva’: Frequency Bands Effects on QRS Detection.</p>
+<p>’mtemp’:</p>
+<p>’pan_tompkins’: A Real-Time QRS Detection Algorithm</p>
+<p>Default = ‘pan_tompkins’</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>an array of 1-D numpy array represent the peak list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.get_ROI">
+<code class="sig-name descname"><span class="pre">get_ROI</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mva</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.get_ROI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.get_ROI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.get_moving_average">
+<code class="sig-name descname"><span class="pre">get_moving_average</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.get_moving_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.get_moving_average" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param q:
+:param w:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.matched_filter_detector">
+<code class="sig-name descname"><span class="pre">matched_filter_detector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfiltered_ecg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.matched_filter_detector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.matched_filter_detector" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+FIR matched filter using template of QRS complex.
+Template provided in generate_template file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.ppg_detector">
+<code class="sig-name descname"><span class="pre">ppg_detector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kmean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cubing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.ppg_detector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.ppg_detector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expose</p>
+<p>PPG peak detector from the paper
+Systolic Peak Detection in Acceleration Photoplethysmograms Measured
+from Emergency Responders in Tropical Conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – the input signal</p></li>
+<li><p><strong>detector_type</strong> – </p></li>
+<li><p><strong>clusterer</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vital_sqi.common.rpeak_detection.PeakDetector.search_for_onset">
+<code class="sig-name descname"><span class="pre">search_for_onset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_max</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vital_sqi/common/rpeak_detection.html#PeakDetector.search_for_onset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vital_sqi.common.rpeak_detection.PeakDetector.search_for_onset" title="Permalink to this definition">¶</a></dt>
+<dd><p>handy
+:param Z:
+:param idx:
+:param local_max:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vital_sqi.common">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vital_sqi.common" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vital-sqi-common">
+<h3>vital_sqi.common<a class="headerlink" href="#vital-sqi-common" title="Permalink to this headline">¶</a></h3>
+<p>A subpackage for shared operations across package vital_sqi</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

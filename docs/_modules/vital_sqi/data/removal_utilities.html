@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vital_sqi.data.removal_utilities &mdash; vital_sqi 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vital_sqi
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/contributions.html">Contributions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example Galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/tutorials/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_examples/sqi/index.html">SQIs</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vital_sqi</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vital_sqi.data.removal_utilities</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vital_sqi.data.removal_utilities</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Trimming raw signals using: invalid values, noise at start/end of</span>
+<span class="sd">recordings etc.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">pmdarima</span> <span class="k">as</span> <span class="nn">pm</span>
+
+<div class="viewcode-block" id="remove_unchanged_squences"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.remove_unchanged_squences">[docs]</a><span class="k">def</span> <span class="nf">remove_unchanged_squences</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">unchanged_seconds</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">number_removed_instances</span> <span class="o">=</span> <span class="n">sampling_rate</span><span class="o">*</span><span class="n">unchanged_seconds</span>
+    <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
+        <span class="n">pleth_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PLETH&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pleth_array</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">pleth_array</span><span class="p">)</span>         <span class="c1"># 123 35 4 0 0 0 0 0 0 123 34 3 1 5 0 0 23 45</span>
+    <span class="n">unchanged_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># 3 4 5 6 7 8 14 15</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unchanged_idx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">],[</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)]</span>
+    <span class="n">continuous_dict</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1">#index of continuous value and the len</span>
+    <span class="n">continuous_len</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">diff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">continuous_len</span> <span class="o">=</span>  <span class="n">continuous_len</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">continuous_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">continuous_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">continuous_len</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">continuous_len</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">start_cut_pivot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">end_cut_pivot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">continuous_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">continuous_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">number_removed_instances</span><span class="p">:</span>
+            <span class="n">start_cut_pivot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">end_cut_pivot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">+</span><span class="n">continuous_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="n">start_milestone</span><span class="p">,</span><span class="n">end_milestone</span> <span class="o">=</span> <span class="n">get_start_end_points</span><span class="p">(</span><span class="n">start_cut_pivot</span><span class="p">,</span><span class="n">end_cut_pivot</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">start_milestone</span><span class="p">,</span><span class="n">end_milestone</span></div>
+
+<div class="viewcode-block" id="remove_invalid"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.remove_invalid">[docs]</a><span class="k">def</span> <span class="nf">remove_invalid</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">as_dataframe</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exposed</span>
+<span class="sd">    Remove  the list of invalid data signal</span>
+<span class="sd">    :param df:</span>
+<span class="sd">    :param as_dataframe:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#TODO Cover the case of different input instead of SMARTCARE device</span>
+    <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
+        <span class="n">pleth_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PLETH&quot;</span><span class="p">])</span>
+        <span class="n">spo2_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;SPO2_PCT&quot;</span><span class="p">])</span>
+        <span class="n">perfusion_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PERFUSION_INDEX&quot;</span><span class="p">])</span>
+        <span class="n">pulse_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PULSE_BPM&quot;</span><span class="p">])</span>
+        <span class="n">indices_start_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">pleth_array</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">spo2_array</span> <span class="o">&gt;=</span> <span class="mi">80</span><span class="p">)</span>
+                                     <span class="o">&amp;</span> <span class="p">(</span><span class="n">pulse_array</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">perfusion_array</span><span class="o">&gt;=</span><span class="mf">0.1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">indices_start_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="o">!=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">diff_res</span> <span class="o">=</span> <span class="n">indices_start_end</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">indices_start_end</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">diff_loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff_res</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">start_milestone</span> <span class="o">=</span> <span class="p">[</span><span class="n">indices_start_end</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">end_milestone</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">diff_loc</span><span class="p">:</span>
+        <span class="n">end_milestone</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices_start_end</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">start_milestone</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices_start_end</span><span class="p">[</span><span class="n">loc</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">end_milestone</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices_start_end</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">start_milestone</span><span class="p">,</span><span class="n">end_milestone</span></div>
+
+<div class="viewcode-block" id="trim_data"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.trim_data">[docs]</a><span class="k">def</span> <span class="nf">trim_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">minute_remove</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expose</span>
+<span class="sd">    :param data:</span>
+<span class="sd">    :param minute_remove:</span>
+<span class="sd">    :param sampling_rate:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if the input trimming length exceed the data length</span>
+    <span class="k">if</span> <span class="n">minute_remove</span><span class="o">*</span><span class="n">sampling_rate</span><span class="o">*</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Input trimming length exceed the data length. Return the same array&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">minute_remove</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">sampling_rate</span><span class="p">:</span><span class="o">-</span><span class="p">(</span><span class="n">minute_remove</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">sampling_rate</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">minute_remove</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">sampling_rate</span><span class="p">:</span><span class="o">-</span><span class="p">(</span><span class="n">minute_remove</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">sampling_rate</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="get_start_end_points"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.get_start_end_points">[docs]</a><span class="k">def</span> <span class="nf">get_start_end_points</span><span class="p">(</span><span class="n">start_cut_pivot</span><span class="p">,</span><span class="n">end_cut_pivot</span><span class="p">,</span><span class="n">length_df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    :param start_cut_pivot: array of starting points of the removal segment</span>
+<span class="sd">    :param end_cut_pivot: array of relevant ending points of removal segment</span>
+<span class="sd">    :param length_df: the length of the origin signal</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">start_cut_pivot</span><span class="p">):</span>
+        <span class="n">start_milestone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">end_cut_pivot</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">length_df</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">end_cut_pivot</span><span class="p">):</span>
+            <span class="n">end_milestone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">start_cut_pivot</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length_df</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end_milestone</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">start_cut_pivot</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">start_milestone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">end_cut_pivot</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">end_milestone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">start_cut_pivot</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length_df</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">start_milestone</span><span class="p">,</span><span class="n">end_milestone</span></div>
+
+<div class="viewcode-block" id="concate_removed_index"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.concate_removed_index">[docs]</a><span class="k">def</span> <span class="nf">concate_removed_index</span><span class="p">(</span><span class="n">start_list</span><span class="p">,</span><span class="n">end_list</span><span class="p">,</span><span class="n">remove_sliding_window</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handy</span>
+<span class="sd">    :param start_list:</span>
+<span class="sd">    :param end_list:</span>
+<span class="sd">    :param remove_sliding_window:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">start_list</span><span class="p">)</span>
+    <span class="n">end_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">end_list</span><span class="p">)</span>
+    <span class="n">diff_list</span> <span class="o">=</span> <span class="n">start_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">end_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">end_list_rm_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff_list</span><span class="o">&lt;=</span><span class="n">remove_sliding_window</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">start_list_rm_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff_list</span> <span class="o">&lt;=</span> <span class="n">remove_sliding_window</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">start_out_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">start_list</span><span class="p">,</span><span class="n">start_list_rm_indices</span><span class="p">)</span>
+    <span class="n">end_out_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">end_list</span><span class="p">,</span> <span class="n">end_list_rm_indices</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">start_out_list</span><span class="p">,</span><span class="n">end_out_list</span></div>
+
+<div class="viewcode-block" id="cut_invalid_rr_peak"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.cut_invalid_rr_peak">[docs]</a><span class="k">def</span> <span class="nf">cut_invalid_rr_peak</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    expose</span>
+<span class="sd">    :param df:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#TODO</span>
+    <span class="k">return</span></div>
+
+<div class="viewcode-block" id="cut_by_frequency_partition"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.cut_by_frequency_partition">[docs]</a><span class="k">def</span> <span class="nf">cut_by_frequency_partition</span><span class="p">(</span><span class="n">df_examine</span><span class="p">,</span>
+                                <span class="n">window_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">peak_threshold_ratio</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">lower_bound_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">remove_sliding_window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">overlap_rate</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expose</span>
+
+<span class="sd">    :param df_examine:</span>
+<span class="sd">    :param window_size:</span>
+<span class="sd">    :param peak_threshold_ratio:</span>
+<span class="sd">    :param lower_bound_threshold:</span>
+<span class="sd">    :param remove_sliding_window:</span>
+<span class="sd">    :param overlap_rate:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">window_size</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">window_size</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="k">if</span> <span class="n">window_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_examine</span><span class="p">):</span>
+        <span class="n">window_size</span>  <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_examine</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">peak_threshold_ratio</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">peak_threshold_ratio</span> <span class="o">=</span> <span class="mf">1.8</span>
+    <span class="k">if</span> <span class="n">lower_bound_threshold</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lower_bound_threshold</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">remove_sliding_window</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">remove_sliding_window</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">overlap_rate</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">overlap_rate</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">window</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_window</span><span class="p">(</span><span class="s2">&quot;boxcar&quot;</span><span class="p">,</span> <span class="n">window_size</span><span class="p">)</span>
+    <span class="n">welch_full</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">welch</span><span class="p">(</span><span class="n">df_examine</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">peaks_full</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">welch_full</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">threshold</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">welch_full</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peaks_full</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">num_peaks_full</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_peaks_full</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">peaks_full</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">remove_start_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">remove_end_indices</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">pter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">pter</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_examine</span><span class="p">):</span>
+        <span class="n">end_pointer</span> <span class="o">=</span> <span class="n">pter</span> <span class="o">+</span> <span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end_pointer</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_examine</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="n">small_partition</span> <span class="o">=</span> <span class="n">df_examine</span><span class="p">[</span><span class="n">pter</span><span class="p">:</span><span class="n">end_pointer</span><span class="p">]</span>
+        <span class="n">welch_small_partition</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">welch</span><span class="p">(</span><span class="n">small_partition</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+        <span class="n">peaks_small_partition</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">welch_small_partition</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                  <span class="n">threshold</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">welch_small_partition</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">peaks_small_partition</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">num_peaks_full</span> <span class="o">*</span> <span class="n">peak_threshold_ratio</span><span class="p">)</span> <span class="ow">or</span>  \
+                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">peaks_small_partition</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">num_peaks_full</span> <span class="o">*</span> <span class="n">lower_bound_threshold</span><span class="p">):</span>
+            <span class="n">remove_start_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pter</span><span class="p">)</span>
+            <span class="n">remove_end_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_pointer</span><span class="p">)</span>
+
+        <span class="n">pter</span> <span class="o">=</span> <span class="n">pter</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">window_size</span> <span class="o">*</span> <span class="n">overlap_rate</span><span class="p">)</span>
+
+    <span class="n">start_trim_by_freq</span><span class="p">,</span> <span class="n">end_trim_by_freq</span> <span class="o">=</span> <span class="n">concate_removed_index</span><span class="p">(</span><span class="n">remove_start_indices</span><span class="p">,</span> <span class="n">remove_end_indices</span><span class="p">,</span>
+                                                                <span class="n">remove_sliding_window</span><span class="p">)</span>
+    <span class="n">start_milestone_by_freq</span><span class="p">,</span><span class="n">end_milestone_by_freq</span> <span class="o">=</span> \
+        <span class="n">get_start_end_points</span><span class="p">(</span><span class="n">start_trim_by_freq</span><span class="p">,</span> <span class="n">end_trim_by_freq</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">df_examine</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">start_milestone_by_freq</span><span class="p">,</span><span class="n">end_milestone_by_freq</span></div>
+
+
+<div class="viewcode-block" id="fill_missing_value"><a class="viewcode-back" href="../../../vital_sqi.data.html#vital_sqi.data.removal_utilities.fill_missing_value">[docs]</a><span class="k">def</span> <span class="nf">fill_missing_value</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">missing_index</span><span class="p">,</span><span class="n">missing_len</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;arima&#39;</span><span class="p">,</span><span class="n">lag_ratio</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param s: array of input time series</span>
+<span class="sd">    :param missing_index: array of list of starting indices missing data</span>
+<span class="sd">    :param missing_len: array of number of missing instances,</span>
+<span class="sd">    matching with the index list</span>
+<span class="sd">    :param method:</span>
+<span class="sd">    :return:</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt; missing_index = np.where(np.diff(df.TIMESTAMP_MS) &gt; 10)[0]</span>
+<span class="sd">    &gt; missing_len = [int((df.TIMESTAMP_MS.iloc[i+1] - df.TIMESTAMP_MS.iloc[i])/10-1)</span>
+<span class="sd">              for i in missing]</span>
+<span class="sd">    &gt; filled_s = fill_missing_value(np.array(df1.PLETH),missing,missing_len)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filled_s</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pos</span><span class="p">,</span><span class="n">number_of_missing_instances</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">missing_index</span><span class="p">,</span><span class="n">missing_len</span><span class="p">):</span>
+        <span class="n">seg_len</span> <span class="o">=</span> <span class="n">number_of_missing_instances</span> <span class="o">*</span> <span class="n">lag_ratio</span>
+        <span class="n">start_seg</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="n">seg_len</span><span class="p">))</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">start_seg</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">pos</span><span class="p">)]</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">auto_arima</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">start_q</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">max_p</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_d</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                              <span class="n">max_q</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">start_P</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">start_Q</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_P</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_D</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">max_Q</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">max_order</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                              <span class="n">m</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="mi">65</span><span class="p">),</span> <span class="n">seasonal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stationary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">information_criterion</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>
+                              <span class="n">test</span><span class="o">=</span><span class="s1">&#39;kpss&#39;</span><span class="p">,</span> <span class="n">seasonal_test</span><span class="o">=</span><span class="s1">&#39;ocsb&#39;</span><span class="p">,</span>
+                              <span class="n">stepwise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">start_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">trend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;lbfgs&#39;</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                              <span class="n">offset_test_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seasonal_test_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">suppress_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">error_action</span><span class="o">=</span><span class="s1">&#39;trace&#39;</span><span class="p">,</span><span class="n">trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">random</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_fits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                              <span class="n">return_valid_fits</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">out_of_sample_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                              <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;mse&#39;</span><span class="p">,</span> <span class="n">scoring_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_intercept</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+
+        <span class="n">fc</span><span class="p">,</span> <span class="n">confint</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">n_periods</span><span class="o">=</span><span class="n">number_of_missing_instances</span><span class="p">,</span> <span class="n">return_conf_int</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">filled_s</span> <span class="o">=</span> <span class="n">filled_s</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+    <span class="n">filled_s</span> <span class="o">=</span> <span class="n">filled_s</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">pos</span><span class="p">):])</span>
+    <span class="k">return</span> <span class="n">filled_s</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Oucru_VN.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
